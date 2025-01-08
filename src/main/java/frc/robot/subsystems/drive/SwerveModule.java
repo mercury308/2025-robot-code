@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.AutoLog;
+
 
 /**
  * Represents a swerve module on a robot's drive system.
@@ -20,7 +22,7 @@ public class SwerveModule {
 	public PIDController pidTurn = new PIDController(MODULE_TURN_KP, 0, 0);
 
 	private ModuleIO io;
-	private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+	private final ModuleIOInputs inputs = new ModuleIOInputs();
 	private String name;
 
 	double offset;
