@@ -1,9 +1,11 @@
 package frc.robot.constants;
 
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -56,13 +58,21 @@ public final class Constants {
 	public static final int ELEVATOR_MOTOR_RIGHT = 30;
 	public static final int ELEVATOR_MOTOR_LEFT = 31;
 
-	public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
+
+	public static final PPHolonomicDriveController PATH_FOLLOWER_CONFIG = new PPHolonomicDriveController(
 			new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-			new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-			4.5, // Max module speed, in m/s
-			0.4488, // Drive base radius in meters. Distance from robot center to furthest module.
-			new ReplanningConfig() // Default path replanning config. See the API for the options here
-			);
+			new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+	);
+
+	public static RobotConfig ROBOT_CONFIG;
+	static{
+		try{
+			ROBOT_CONFIG = RobotConfig.fromGUISettings();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
 	public static final double SHOOTER_SPEAKER_SPEED = 0.75;
 
 	public static class FieldConstants {

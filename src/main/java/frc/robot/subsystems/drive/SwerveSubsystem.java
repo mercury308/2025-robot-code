@@ -4,9 +4,13 @@ import static frc.robot.RobotContainer.*;
 import static frc.robot.constants.Constants.*;
 import static frc.robot.constants.Constants.RobotConstants.*;
 
+import java.util.function.BiConsumer;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -21,9 +25,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.constants.SwerveModuleConfiguration;
 import frc.robot.util.Util;
+
+import java.io.IOException;
 import java.util.Optional;
+
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
@@ -40,6 +49,7 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Translation2d(-ROBOT_LENGTH / 2, ROBOT_WIDTH / 2),
 			new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2));
 	public SwerveDrivePoseEstimator pose_est;
+	
 
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
@@ -55,12 +65,13 @@ public class SwerveSubsystem extends SubsystemBase {
 				VecBuilder.fill(0.1, 0.1, 0.1),
 				VecBuilder.fill(0.5, 0.5, 0.3));
 
-		AutoBuilder.configureHolonomic(
+		AutoBuilder.configure(
 				this::getPose,
 				(pose) -> pose_est.resetPosition(new Rotation2d(imu.yaw()), getPositions(), pose),
 				this::getVelocity,
 				this::drive,
 				PATH_FOLLOWER_CONFIG,
+				ROBOT_CONFIG,
 				() -> Util.isRed(),
 				this);
 
@@ -101,7 +112,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 *
 	 * @param speed the desired speed of the swerve subsystem
 	 */
-	public void drive(ChassisSpeeds speed) {
+	public void drive(ChassisSpeeds speed, DriveFeedforwards FF) {
 		speed = ChassisSpeeds.discretize(speed, 0.02);
 		desired_speeds = speed;
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(speed);
@@ -218,16 +229,19 @@ public class SwerveSubsystem extends SubsystemBase {
 		return Math.sin(theta) * velocity.vyMetersPerSecond + Math.cos(theta) * velocity.vxMetersPerSecond;
 	}
 
-	public Command followPath(String fileString) {
-		PathPlannerPath path = PathPlannerPath.fromPathFile(fileString);
+	
 
-		return new FollowPathHolonomic(
+	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {
+		PathPlannerPath path  = PathPlannerPath.fromPathFile(fileString);
+		return new FollowPathCommand(
 				path,
 				this::getPose,
 				this::getVelocity,
 				this::drive,
 				PATH_FOLLOWER_CONFIG,
-				() -> DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue),
-				this);
+				ROBOT_CONFIG,
+				() -> DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue), 
+				this
+				);
 	}
 }

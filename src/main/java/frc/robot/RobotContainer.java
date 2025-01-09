@@ -7,7 +7,10 @@ package frc.robot;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.PhotonVision;
+import frc.robot.subsystems.drive.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -20,6 +23,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  public static SwerveSubsystem drive = new SwerveSubsystem();
+  public static IMU imu = new IMU();
+  public static PhotonVision photon = new PhotonVision();
+
+  public static CommandJoystick left_js = new CommandJoystick(4);
+  public static CommandJoystick right_js = new CommandJoystick(3);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
