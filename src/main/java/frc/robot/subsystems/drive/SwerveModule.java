@@ -22,7 +22,7 @@ public class SwerveModule {
 	public PIDController pidTurn = new PIDController(MODULE_TURN_KP, 0, 0);
 
 	private ModuleIO io;
-	private final ModuleIOInputs inputs = new ModuleIOInputs();
+	private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
 	private String name;
 
 	double offset;
@@ -53,7 +53,7 @@ public class SwerveModule {
 	 * @param state the desired state of the SwerveModule
 	 */
 	public void setState(SwerveModuleState state) {
-		state = SwerveModuleState.optimize(state, new Rotation2d(getDirection()));
+		state.optimize(new Rotation2d(getDirection()));
 		target_state = state;
 	}
 

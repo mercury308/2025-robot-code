@@ -38,13 +38,6 @@ public final class Constants {
 
 	public static final double CAMERA_HEIGHT = Units.inchesToMeters(13.5);
 
-	public static final int RING_SENSOR = 1;
-	public static final int SHOOTER_MOTOR_BOT = 21;
-	public static final int SHOOTER_MOTOR_TOP = 22;
-	public static final int SHOOTER_PIVOT_MOTOR1 = 13;
-	public static final int SHOOTER_PIVOT_MOTOR2 = 4;
-	public static final int FEEDER_MOTOR = 3;
-
 	public static final int INTAKE_FEEDER_MOTOR = 2;
 	public static final int INTAKE_PIVOT_MOTOR = 14;
 
@@ -54,10 +47,6 @@ public final class Constants {
 	public static final double SHOOTER_ENCODER_OFFSET = 0.516 + 0.022;
 	public static final double SHOOTER_HEIGHT = Units.inchesToMeters(15);
 	public static final double TARGET_HEIGHT = Units.inchesToMeters(95);
-
-	public static final int ELEVATOR_MOTOR_RIGHT = 30;
-	public static final int ELEVATOR_MOTOR_LEFT = 31;
-
 
 	public static final PPHolonomicDriveController PATH_FOLLOWER_CONFIG = new PPHolonomicDriveController(
 			new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
@@ -73,14 +62,4 @@ public final class Constants {
 		}
 	}
 	
-	public static final double SHOOTER_SPEAKER_SPEED = 0.75;
-
-	public static class FieldConstants {
-		public static final double TARGET_X_BLUE = Units.inchesToMeters(-1.5 + 0);
-		public static final double TARGET_X_RED = Units.inchesToMeters(652.3 - 0);
-		public static final double TARGET_Y = Units.inchesToMeters(218.42);
-
-		public static final Translation2d TARGET_BLUE = new Translation2d(TARGET_X_BLUE, TARGET_Y);
-		public static final Translation2d TARGET_RED = new Translation2d(TARGET_X_RED, TARGET_Y);
-	}
 }

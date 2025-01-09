@@ -1,7 +1,6 @@
 
 package frc.robot.util;
 
-import static frc.robot.constants.Constants.FieldConstants.*;
 import static frc.robot.constants.Constants.RobotConstants.*;
 import static java.lang.Math.*;
 
@@ -89,7 +88,5 @@ public class Util {
 	 *
 	 * @return the x-coordinate of the target
 	 */
-	public static double getTargetX() {
-		return isRed() ? TARGET_X_RED : TARGET_X_BLUE;
-	}
+
 }

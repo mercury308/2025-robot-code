@@ -32,7 +32,7 @@ public class PhotonVision {
 
 	public PhotonVision() {
 		try {
-			fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+			fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
 		} catch (IOException e) {
 			System.out.println("Couldn't Find April Tag Layout File");
 			e.printStackTrace();
@@ -63,7 +63,7 @@ public class PhotonVision {
 		Transform2d noteCam = new Transform2d(dx, dy, new Rotation2d());
 		if (pitch > 0) return Optional.empty();
 		else return Optional.of(camRobot.plus(noteCam));
-	}
+	} 
 
 	/**
 	 * Returns an optional EstimatedRobotPose object representing the estimated global pose of the robot.
@@ -76,6 +76,6 @@ public class PhotonVision {
 		if (!april_cam.isConnected()) return Optional.empty();
 		if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
 
-		return photonPoseEstimator.update();
+		return photonPoseEstimator.update(april_cam.getLatestResult());
 	}
 }

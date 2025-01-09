@@ -64,7 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
 				init_pose,
 				VecBuilder.fill(0.1, 0.1, 0.1),
 				VecBuilder.fill(0.5, 0.5, 0.3));
-
+				
 		AutoBuilder.configure(
 				this::getPose,
 				(pose) -> pose_est.resetPosition(new Rotation2d(imu.yaw()), getPositions(), pose),
@@ -112,12 +112,14 @@ public class SwerveSubsystem extends SubsystemBase {
 	 *
 	 * @param speed the desired speed of the swerve subsystem
 	 */
-	public void drive(ChassisSpeeds speed, DriveFeedforwards FF) {
+	public void drive(ChassisSpeeds speed) {
 		speed = ChassisSpeeds.discretize(speed, 0.02);
 		desired_speeds = speed;
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(speed);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, SWERVE_MAXSPEED);
-		for (int i = 0; i < 4; i++) modules[i].setState(states[i]);
+		for (int i = 0; i < 4; i++){
+			modules[i].setState(states[i]);
+		}
 	}
 
 	public void getOffsets() {
@@ -164,14 +166,6 @@ public class SwerveSubsystem extends SubsystemBase {
 			states[i * 2] = modules[i].getMeasuredState().angle.getRadians();
 		Logger.recordOutput("/Swerve/module_speeds", states);
 
-		Optional<Pose2d> noteEst = photon.getNearestNote();
-		if (noteEst.isPresent()) {
-			Pose2d node_pos = noteEst.get();
-			double[] note_pos = {
-				node_pos.getX(), node_pos.getY(), node_pos.getRotation().getRadians()
-			};
-			Logger.recordOutput("note_pos", note_pos);
-		}
 	}
 
 	private Optional<EstimatedRobotPose> est_pos;
@@ -186,6 +180,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
 		est_pos = photon.getEstimatedGlobalPose();
+		
 		if (est_pos.isPresent()) {
 			EstimatedRobotPose new_pose = est_pos.get();
 			Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
@@ -233,15 +228,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {
 		PathPlannerPath path  = PathPlannerPath.fromPathFile(fileString);
-		return new FollowPathCommand(
-				path,
-				this::getPose,
-				this::getVelocity,
-				this::drive,
-				PATH_FOLLOWER_CONFIG,
-				ROBOT_CONFIG,
-				() -> DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Blue), 
-				this
-				);
+		return AutoBuilder.followPath(path);
 	}
 }
