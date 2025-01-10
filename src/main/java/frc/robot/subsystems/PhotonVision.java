@@ -19,7 +19,6 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVision {
-	private PhotonCamera note_cam;
 	private PhotonCamera april_cam;
 	AprilTagFieldLayout fieldLayout;
 
@@ -32,38 +31,20 @@ public class PhotonVision {
 
 	public PhotonVision() {
 		try {
-			fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
+			fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
 		} catch (IOException e) {
 			System.out.println("Couldn't Find April Tag Layout File");
 			e.printStackTrace();
 		}
 
-		note_cam = new PhotonCamera("Global_Shutter_Camera (1)");
+		//note_cam = new PhotonCamera("Global_Shutter_Camera (1)");
 
-		april_cam = new PhotonCamera("Global_Shutter_Camera");
+		april_cam = new PhotonCamera("Global_Shutter_Camera (1)");
 		photonPoseEstimator =
 				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,  robotToCam);
 		photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 	}
-        
-	/**
-	 * Returns the nearest note's pose relative to the robot's pose.
-	 *
-	 * @return An Optional containing the nearest note's pose if it exists, or an empty Optional otherwise.
-	 */
-	public Optional<Pose2d> getNearestNote() {
-		if (note_cam == null) return Optional.empty();
-		if (!note_cam.getLatestResult().hasTargets()) return Optional.empty();
-		PhotonTrackedTarget target = note_cam.getLatestResult().getBestTarget();
-		if (target == null) return Optional.empty();
-		double pitch = Units.degreesToRadians(target.getPitch());
-		double yaw = Units.degreesToRadians(target.getYaw());
-		double dx = Constants.CAMERA_HEIGHT / Math.tan(pitch);
-		double dy = dx * Math.tan(yaw);
-		Transform2d noteCam = new Transform2d(dx, dy, new Rotation2d());
-		if (pitch > 0) return Optional.empty();
-		else return Optional.of(camRobot.plus(noteCam));
-	} 
+	
 
 	/**
 	 * Returns an optional EstimatedRobotPose object representing the estimated global pose of the robot.
@@ -78,4 +59,20 @@ public class PhotonVision {
 
 		return photonPoseEstimator.update(april_cam.getLatestResult());
 	}
+
+	public Optional<Pose2d> getAprilTagPose(){
+		if (april_cam == null) return Optional.empty();
+		if (!april_cam.isConnected()) return Optional.empty();
+		if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
+
+		PhotonTrackedTarget target = april_cam.getLatestResult().getBestTarget();
+		return Optional.of(
+				fieldLayout
+				.getTagPose(target
+				.getFiducialId())
+				.get()
+				.toPose2d());
+		
+	}
+
 }

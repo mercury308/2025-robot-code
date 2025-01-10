@@ -9,8 +9,13 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.drive.DefaultDrive;
 import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.commands.drive.AlignToReef;
+import frc.robot.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.pathfinding.LocalADStar;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +38,7 @@ public class RobotContainer {
 
   public static CommandJoystick left_js = new CommandJoystick(4);
   public static CommandJoystick right_js = new CommandJoystick(3);
+  public static CommandJoystick ds = new CommandJoystick(2);
 
   public static LoggedDashboardChooser<Command> autoChooser;
 
@@ -49,11 +55,13 @@ public class RobotContainer {
     
     drive.setDefaultCommand(new DefaultDrive(() -> left_js.getY(), () -> left_js.getX(),() -> right_js.getX()));
     drive.init(new Pose2d());
+    Pathfinding.setPathfinder(new LocalADStarAK());
   }
 
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-   
+    right_js.button(4).onTrue(new AlignToReef());
+    
   }
 
   /**

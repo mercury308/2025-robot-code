@@ -83,6 +83,15 @@ public class Util {
 		return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
 	}
 
+	public static double convertAngle(double angle){ //Converts an angle over pi radians into a negative angle
+		if(angle < Math.PI){
+			return angle;
+		}
+		else{
+			return -(2 * Math.PI - angle);
+		}
+	}
+
 	/**
 	 * Returns the x-coordinate of the target based on the alliance color.
 	 *
