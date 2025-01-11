@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constants.Constants;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -31,15 +32,15 @@ public class PhotonVision {
 
 	public PhotonVision() {
 		try {
-			fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
-		} catch (IOException e) {
+			fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+		} catch (UncheckedIOException e) {
 			System.out.println("Couldn't Find April Tag Layout File");
 			e.printStackTrace();
 		}
 
 		//note_cam = new PhotonCamera("Global_Shutter_Camera (1)");
 
-		april_cam = new PhotonCamera("Global_Shutter_Camera (1)");
+		april_cam = new PhotonCamera("Global_Shutter_Camera");
 		photonPoseEstimator =
 				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,  robotToCam);
 		photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -55,23 +56,28 @@ public class PhotonVision {
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
 		if (april_cam == null) return Optional.empty();
 		if (!april_cam.isConnected()) return Optional.empty();
-		if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
+		//if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
 
 		return photonPoseEstimator.update(april_cam.getLatestResult());
 	}
-
+	// Returns the pose of an AprilTag relative to CAMERA
 	public Optional<Pose2d> getAprilTagPose(){
 		if (april_cam == null) return Optional.empty();
 		if (!april_cam.isConnected()) return Optional.empty();
-		if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
+		//if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
 
 		PhotonTrackedTarget target = april_cam.getLatestResult().getBestTarget();
+		if(target == null){
+			//System.out.println("NO TARGETS IN SIGHT");
+			return Optional.empty();
+		}
 		return Optional.of(
 				fieldLayout
-				.getTagPose(target
-				.getFiducialId())
-				.get()
-				.toPose2d());
+				.getTagPose(
+					target
+					.getFiducialId())
+					.get()
+					.toPose2d());
 		
 	}
 

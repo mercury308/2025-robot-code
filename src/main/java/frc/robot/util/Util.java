@@ -88,14 +88,10 @@ public class Util {
 			return angle;
 		}
 		else{
-			return -(2 * Math.PI - angle);
+			return angle - (2*Math.PI);
 		}
 	}
 
-	/**
-	 * Returns the x-coordinate of the target based on the alliance color.
-	 *
-	 * @return the x-coordinate of the target
-	 */
+	
 
 }
