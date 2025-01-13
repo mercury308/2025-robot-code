@@ -61,7 +61,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     right_js.button(4).onTrue(new AlignToReef());
-    
+      
   }
 
   /**
