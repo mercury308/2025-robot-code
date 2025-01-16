@@ -40,15 +40,15 @@ public class AlignToReef extends Command{
        double X = target.getX(); 
        double Y = target.getY();
         if(current.getY() < target.getY()){
-            Y -= 0.305; // Radius of robot not including bumper, will adjust in future
+            Y -= 0.3875; // Radius of robot not including bumper, will adjust in future
         }else{
-            Y += 0.305;
+            Y += 0.3875;
         }
 
         if(current.getX() < target.getX()){
-            X -= 0.305;
+            X -= 0.3875;
         }else{
-            X += 0.305;
+            X += 0.3875;
         }
 
         returnable = new Pose2d(X, Y, current.getRotation());
@@ -63,6 +63,7 @@ public class AlignToReef extends Command{
         if(target_pose.isEmpty() && stored_pose.isEmpty()){ // For reliability, if not receiving new pose from PhotonVision, use previously saved pose if any as reference
             return;
         }else if(target_pose.isEmpty() && !stored_pose.isEmpty()){
+            System.out.println(drive.getPose().getTranslation().getDistance(stored_pose.get().getTranslation()));
             target_pose = stored_pose;
         }
 
@@ -115,11 +116,10 @@ public class AlignToReef extends Command{
 
         if(dist <= 0.05 && angle_offset <= (2*Math.PI)/360){
             System.out.println("Aligned");
-
             return true;
         }
         
-        System.out.println("Still working on it    Distance: " + dist + " Angular Dist: " + angle_offset);
+       // System.out.println("Still working on it    Distance: " + dist + " Angular Dist: " + angle_offset);
         return false;
 		
 	}
