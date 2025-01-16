@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.Util;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 
 
 
@@ -40,15 +41,14 @@ public class AlignToReef extends Command{
        double X = target.getX(); 
        double Y = target.getY();
         if(current.getY() < target.getY()){
-            Y -= 0.3875; // Radius of robot not including bumper, will adjust in future
+            Y -= ROBOT_WIDTH/2; // Radius of robot not including bumper, will adjust in future
         }else{
-            Y += 0.3875;
+            Y += ROBOT_WIDTH/2;
         }
-
         if(current.getX() < target.getX()){
-            X -= 0.3875;
+            X -= ROBOT_WIDTH/2;
         }else{
-            X += 0.3875;
+            X += ROBOT_WIDTH/2;
         }
 
         returnable = new Pose2d(X, Y, current.getRotation());
