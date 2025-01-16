@@ -1,6 +1,7 @@
 package frc.robot.commands.drive;
 
 import static frc.robot.RobotContainer.*;
+import static frc.robot.constants.Constants.RobotConstants.*;
 
 import java.util.Optional;
 
@@ -20,12 +21,12 @@ public class AlignToReef extends Command{
     
     // TODO: Adjust PID gains
 
-    private PIDController xPID = new PIDController(1.6, 0, 0.5);
-    private PIDController yPID = new PIDController(1.6, 0, 0.5);
-    private PIDController wPID = new PIDController(1, 0, 0);
+    private PIDController xPID = new PIDController(2, 0.01, 0);
+    private PIDController yPID = new PIDController(2, 0.01, 0);
+    private PIDController wPID = new PIDController(2, 0, 0);
 
     private Optional<Pose2d> target_pose;
-    private Optional<Pose2d> stored_pose;
+    private Optional<Pose2d> stored_pose = Optional.empty();
 
     public AlignToReef(){
         addRequirements(drive);
@@ -39,7 +40,7 @@ public class AlignToReef extends Command{
        double X = target.getX(); 
        double Y = target.getY();
         if(current.getY() < target.getY()){
-            Y -= 0.305;
+            Y -= 0.305; // Radius of robot not including bumper, will adjust in future
         }else{
             Y += 0.305;
         }
@@ -78,8 +79,8 @@ public class AlignToReef extends Command{
         double curr_rot = current_pose.getRotation().getRadians();
         double  target_rot = Math.PI + target_pose.get().getRotation().getRadians();
 
-        double vX = xPID.calculate(curr_X, adj_X); // Have PID adjust current translation to match target
-        double vY = yPID.calculate(curr_Y, adj_Y);
+        double vX = MathUtil.clamp(xPID.calculate(curr_X, adj_X), -5.5, 5.5); // Have PID adjust current translation to match target
+        double vY = MathUtil.clamp(yPID.calculate(curr_Y, adj_Y), -5.5, 5.5); // Have PID adjust current translation to match target
         double vW = wPID.calculate(curr_rot, target_rot);
 
         Logger.recordOutput("/Odom/target pose", adj_target);
@@ -96,24 +97,38 @@ public class AlignToReef extends Command{
         if(target_pose.isEmpty()) return false;
 
         Pose2d current_pose = drive.getPose();
-        double dist = Math.abs(current_pose.getTranslation().getDistance(getAdjustedPose(current_pose, target_pose.get()).getTranslation())); // Translational difference
-        double angle_offset =  Math.abs(Util.convertAngle(current_pose.getRotation().getRadians()) - Util.convertAngle(target_pose.get().getRotation().getRadians())); // Angular difference
+        double dist = Math.abs(
+            current_pose.getTranslation()
+            .getDistance(
+                getAdjustedPose(current_pose, target_pose.get()).getTranslation())); // Translational difference
+       
+        double angle_offset =  Math.abs(
+            Util.convertAngle(
+                current_pose
+                .getRotation()
+                .getRadians()) 
+            - Util.convertAngle(
+                target_pose.get()
+                .getRotation()
+                .getRadians() + Math.PI)); // Angular difference
 
 
-        if(dist <= 0.5 && angle_offset <= 1/(2*Math.PI)){
+        if(dist <= 0.05 && angle_offset <= (2*Math.PI)/360){
+            System.out.println("Aligned");
+
             return true;
         }
-
+        
+        System.out.println("Still working on it    Distance: " + dist + " Angular Dist: " + angle_offset);
         return false;
 		
 	}
 
     @Override
     public void end(boolean interrupted){
-
         super.end(interrupted);
         drive.drive(new ChassisSpeeds());
-        stored_pose = null;
+        stored_pose = Optional.empty();
 
     }
 
