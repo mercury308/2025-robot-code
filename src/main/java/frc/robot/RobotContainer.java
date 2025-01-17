@@ -4,12 +4,11 @@
 
 package frc.robot;
 
-import frc.robot.commands.Autos;
-
 import frc.robot.commands.drive.DefaultDrive;
 import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.commands.drive.AlignToReef;
+import frc.robot.commands.drive.LateralAlign;
 import frc.robot.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -60,9 +59,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    right_js.button(4).onTrue(new AlignToReef());
-
-      
+    right_js.button(4).onTrue(new LateralAlign()
+                            .andThen(new AlignToReef()));
   }
 
   /**

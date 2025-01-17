@@ -24,11 +24,11 @@ public class PhotonVision {
 	AprilTagFieldLayout fieldLayout;
 
 	Transform3d robotToCam = new Transform3d(
-			new Translation3d(Units.inchesToMeters(2 * 14.5), Units.inchesToMeters(0), 0.01),
-			new Rotation3d(0, Units.degreesToRadians(30), 0));
+			new Translation3d(Units.inchesToMeters(15), Units.inchesToMeters(0), 0.01),
+			new Rotation3d(0, Units.degreesToRadians(0), 0));
 	PhotonPoseEstimator photonPoseEstimator;
 
-	private Pose2d camRobot = new Pose2d(Units.inchesToMeters(0), Units.inchesToMeters(11), new Rotation2d());
+//	private Pose2d camRobot = new Pose2d(Units.inchesToMeters(0), Units.inchesToMeters(11), new Rotation2d());
 
 	public PhotonVision() {
 		try {
