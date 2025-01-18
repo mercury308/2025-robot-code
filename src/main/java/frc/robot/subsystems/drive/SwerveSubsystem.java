@@ -36,6 +36,8 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
+import edu.wpi.first.math.filter.LinearFilter;
+
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
 		new SwerveModule(new ModuleIOSparkMax(SwerveModuleConfiguration.NW), "NW"),
@@ -48,8 +50,11 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Translation2d(ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2),
 			new Translation2d(-ROBOT_LENGTH / 2, ROBOT_WIDTH / 2),
 			new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2));
+
 	public SwerveDrivePoseEstimator pose_est;
-	
+
+	public LinearFilter x_Filter = LinearFilter.singlePoleIIR(0.1, 0.02);
+	public LinearFilter y_Filter = LinearFilter.singlePoleIIR(0.1, 0.02);
 
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
@@ -196,7 +201,11 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @return the current estimated pose of the robot
 	 */
 	public Pose2d getPose() {
-		return pose_est.getEstimatedPosition();
+		Pose2d est_pose = pose_est.getEstimatedPosition();
+		double filtered_x = x_Filter.calculate(est_pose.getX());
+		double filtered_y = y_Filter.calculate(est_pose.getY());
+
+		return new Pose2d(filtered_x, filtered_y, est_pose.getRotation());
 	}
 
 	/**
