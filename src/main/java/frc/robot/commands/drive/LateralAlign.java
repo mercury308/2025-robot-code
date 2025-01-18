@@ -22,13 +22,13 @@ import edu.wpi.first.math.util.Units;
 
 public class LateralAlign extends Command{
     
-    private PIDController yPID = new PIDController(1.5, 0., 0);
-
     private double phi = Math.PI/6;
 
     private Optional<Pose2d> target_pose;
     private Optional<Pose2d> stored_pose = Optional.empty();
     private Pose2d adjPose2d;
+    private final double pConst = 0.1;
+    private final double wConst = 0.1;
 
     public LateralAlign(){
         addRequirements(drive);
@@ -43,10 +43,9 @@ public class LateralAlign extends Command{
             target_pose = stored_pose;
         }
 
-        adjPose2d = target_pose.get().transformBy(new Transform2d(new Translation2d(), new Rotation2d(Math.PI)));
+        adjPose2d = target_pose.get().transformBy(new Transform2d(new Translation2d(), new Rotation2d()));
 
     }
-
 
     @Override
     public void execute() {
@@ -61,10 +60,13 @@ public class LateralAlign extends Command{
         double target_y = adjPose2d.getY();
 
         phi = Math.atan2(Math.abs(target_y-current_y),Math.abs(target_x-current_x));
-        
-        
+        double thetaT = adjPose2d.getRotation().getRadians();
+        double theta = current_pose.getRotation().getRadians();
+
+        double dTheta = (Math.PI/2 - thetaT + theta);
+        Logger.recordOutput("/Alignment/target pose", adjPose2d);
         drive.drive(
-            ChassisSpeeds.fromFieldRelativeSpeeds(0,0 , 0, drive.getPose().getRotation()) // drive with calculated velocities
+            ChassisSpeeds.fromFieldRelativeSpeeds(-pConst * phi*Math.sin(dTheta),pConst * phi*Math.cos(dTheta) , wConst* dTheta, drive.getPose().getRotation()) // drive with calculated velocities
         );
         stored_pose = target_pose; // store current pose for potential future reference
     }
@@ -82,6 +84,7 @@ public class LateralAlign extends Command{
 
     @Override
     public void end(boolean interrupted){
+
         super.end(interrupted);
         drive.drive(new ChassisSpeeds());
         stored_pose = Optional.empty();

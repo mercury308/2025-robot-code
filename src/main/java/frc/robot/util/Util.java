@@ -98,7 +98,7 @@ public class Util {
 	public static Pose2d getAdjustedPose(Pose2d target){
 
        Pose2d returnable = target;
-       Transform2d currentToTarget = new Transform2d(new Translation2d(-(ROBOT_WIDTH/2)-0.03, 0), new Rotation2d(Math.PI));
+       Transform2d currentToTarget = new Transform2d(new Translation2d((ROBOT_WIDTH/2)+0.06, 0), new Rotation2d(Math.PI));
        return returnable.transformBy(currentToTarget);
     }
 
