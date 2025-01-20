@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 import frc.robot.Robot;
 import frc.robot.constants.SwerveModuleConfiguration;
 import frc.robot.util.Util;
@@ -53,18 +54,13 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2));
 
 	public SwerveDrivePoseEstimator pose_est;
-
-	public MedianFilter xFilter = new MedianFilter(10);
-	public MedianFilter yFilter = new MedianFilter(10);
-
+	public boolean doRejectUpdate = false;
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
 	 *
 	 * @param init_pose The initial pose of the robot.
 	 */
 	public void init(Pose2d init_pose) {
-		xFilter.reset();
-		yFilter.reset();
 		pose_est = new SwerveDrivePoseEstimator(
 				kinematics,
 				new Rotation2d(imu.yaw()),
@@ -89,6 +85,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
 			Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
 		});
+
+		LimelightHelpers.SetRobotOrientation("limelight", pose_est.getEstimatedPosition().getRotation().getDegrees(),0,0,0,0,0);
 	}
 
 	/**
@@ -159,9 +157,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		Logger.recordOutput("/Odom/rot", pose_est.getEstimatedPosition().getRotation());
 
 		Logger.recordOutput("/Odom/x", pose_est.getEstimatedPosition().getX());
-		Logger.recordOutput("/Odom/filtered x", xFilter.calculate(pose_est.getEstimatedPosition().getX()));
 		Logger.recordOutput("/Odom/y", pose_est.getEstimatedPosition().getY());
-		Logger.recordOutput("/Odom/filtered y", yFilter.calculate(pose_est.getEstimatedPosition().getY()));
 		Logger.recordOutput("/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
 
 		double[] states = new double[8];
@@ -188,14 +184,19 @@ public class SwerveSubsystem extends SubsystemBase {
 		for (SwerveModule module : modules) module.periodic();
 		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
-		est_pos = photon.getEstimatedGlobalPose();
-		
-		if (est_pos.isPresent()) {
-			EstimatedRobotPose new_pose = est_pos.get();
-			Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
-			pose_est.addVisionMeasurement(new_pose.estimatedPose.toPose2d(), new_pose.timestampSeconds);
+		LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+		if(Math.abs(imu.getAngularVelocity()) > 720){
+			doRejectUpdate = true;
 		}
-
+		if(mt2.tagCount == 0){
+			doRejectUpdate = true;
+		}
+		if(!doRejectUpdate){
+			pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,99999999));
+			pose_est.addVisionMeasurement(
+				mt2.pose,
+				mt2.timestampSeconds);
+		}
 		updateLogging();
 	}
 
@@ -206,9 +207,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Pose2d getPose() {
 		Pose2d est_pose = pose_est.getEstimatedPosition();
-		double filtered_x = xFilter.calculate(est_pose.getX());
-		double filtered_y = yFilter.calculate(est_pose.getY());
-		return new Pose2d(filtered_x, filtered_y, est_pose.getRotation());
+		return est_pose;
 	}
 
 	/**

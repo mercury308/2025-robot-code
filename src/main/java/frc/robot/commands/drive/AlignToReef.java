@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +17,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.LimelightHelpers;
+import frc.robot.LimelightHelpers.LimelightResults;
+import frc.robot.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.robot.util.Util;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -33,6 +38,7 @@ public class AlignToReef extends Command{
     private Optional<Pose2d> stored_pose = Optional.empty();
 
     private Pose2d adj_pose;
+    AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     public AlignToReef(){
         addRequirements(drive);
@@ -41,7 +47,17 @@ public class AlignToReef extends Command{
 
     @Override 
     public void initialize(){
-        target_pose = photon.getAprilTagPose();
+        LimelightResults results = LimelightHelpers.getLatestResults("limelight");
+        if(results.targets_Fiducials.length > 0){
+            LimelightTarget_Fiducial tag = results.targets_Fiducials[0];
+            double id = tag.fiducialID; 
+            target_pose = Optional.of(fieldLayout.getTagPose((int) id).get().toPose2d());
+            
+        }else{
+            target_pose = Optional.empty();
+        }
+
+
         if(target_pose.isEmpty() && stored_pose.isEmpty()){ // For reliability, if not receiving new pose from PhotonVision, use previously saved pose if any as reference
             return;
         }else if(target_pose.isEmpty() && !stored_pose.isEmpty()){

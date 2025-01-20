@@ -5,10 +5,8 @@
 package frc.robot;
 
 import frc.robot.commands.drive.DefaultDrive;
-import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.commands.drive.AlignToReef;
-import frc.robot.commands.drive.LateralAlign;
 import frc.robot.util.LocalADStarAK;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -33,7 +31,6 @@ public class RobotContainer {
 
   public static SwerveSubsystem drive = new SwerveSubsystem();
   public static IMU imu = new IMU();
-  public static PhotonVision photon = new PhotonVision();
 
   public static CommandJoystick left_js = new CommandJoystick(4);
   public static CommandJoystick right_js = new CommandJoystick(3);
