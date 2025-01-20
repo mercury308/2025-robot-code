@@ -25,9 +25,9 @@ public class AlignToReef extends Command{
     
     // TODO: Adjust PID gains
 
-    private PIDController xPID = new PIDController(3., 0.1, 0.4);
-    private PIDController yPID = new PIDController(2, 0.1, 0.1);
-    private PIDController wPID = new PIDController(2, 0, 1);
+    private PIDController xPID = new PIDController(3, 0, 0.4);
+    private PIDController yPID = new PIDController(5, 0, 0.25);
+    private PIDController wPID = new PIDController(1.4, 0., 0.4);
 
     private Optional<Pose2d> target_pose;
     private Optional<Pose2d> stored_pose = Optional.empty();
@@ -72,6 +72,11 @@ public class AlignToReef extends Command{
 
     
         Logger.recordOutput("/Odom/adjusted pose", adj_pose);
+        Logger.recordOutput("/Odom/adjusted_pose/x", adj_X);
+        Logger.recordOutput("/Odom/adjusted_pose/y", adj_Y);
+        Logger.recordOutput("/Odom/adjusted_pose/w", adj_pose.getRotation().getRadians());
+
+
        // Logger.recordOutput("/Odom/target pose", target_pose.get());
        // Logger.recordOutput("/Swerve/distance", current_pose.getTranslation().getDistance(adj_pose.getTranslation()));
 
@@ -103,7 +108,7 @@ public class AlignToReef extends Command{
                 .getRadians())); // Angular difference
 
 
-        if(dist <= 0.095 && angle_offset <= (2*Math.PI)/360){
+        if(dist <= 0.1 && angle_offset <= (4*Math.PI)/360){
             System.out.println("Aligned");
             return true;
         }

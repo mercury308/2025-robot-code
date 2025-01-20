@@ -37,6 +37,7 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.filter.MedianFilter;
 
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
@@ -53,8 +54,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	public SwerveDrivePoseEstimator pose_est;
 
-	public LinearFilter x_Filter = LinearFilter.singlePoleIIR(0.1, 0.02);
-	public LinearFilter y_Filter = LinearFilter.singlePoleIIR(0.1, 0.02);
+	public MedianFilter xFilter = new MedianFilter(10);
+	public MedianFilter yFilter = new MedianFilter(10);
 
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
@@ -62,6 +63,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param init_pose The initial pose of the robot.
 	 */
 	public void init(Pose2d init_pose) {
+		xFilter.reset();
+		yFilter.reset();
 		pose_est = new SwerveDrivePoseEstimator(
 				kinematics,
 				new Rotation2d(imu.yaw()),
@@ -152,13 +155,14 @@ public class SwerveSubsystem extends SubsystemBase {
 				"/Swerve/speeds",
 				new double[] {speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond});
 
-		Logger.recordOutput("/Odom/pose", pose_est.getEstimatedPosition());
+		Logger.recordOutput("/Odom/pose", getPose());
 		Logger.recordOutput("/Odom/rot", pose_est.getEstimatedPosition().getRotation());
 
 		Logger.recordOutput("/Odom/x", pose_est.getEstimatedPosition().getX());
+		Logger.recordOutput("/Odom/filtered x", xFilter.calculate(pose_est.getEstimatedPosition().getX()));
 		Logger.recordOutput("/Odom/y", pose_est.getEstimatedPosition().getY());
-		Logger.recordOutput(
-				"/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
+		Logger.recordOutput("/Odom/filtered y", yFilter.calculate(pose_est.getEstimatedPosition().getY()));
+		Logger.recordOutput("/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
 
 		double[] states = new double[8];
 		for (int i = 0; i < 4; i++) states[i * 2 + 1] = modules[i].getTargetState().speedMetersPerSecond;
@@ -202,9 +206,8 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public Pose2d getPose() {
 		Pose2d est_pose = pose_est.getEstimatedPosition();
-		double filtered_x = x_Filter.calculate(est_pose.getX());
-		double filtered_y = y_Filter.calculate(est_pose.getY());
-
+		double filtered_x = xFilter.calculate(est_pose.getX());
+		double filtered_y = yFilter.calculate(est_pose.getY());
 		return new Pose2d(filtered_x, filtered_y, est_pose.getRotation());
 	}
 
