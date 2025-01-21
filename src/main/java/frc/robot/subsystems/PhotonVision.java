@@ -57,7 +57,8 @@ public class PhotonVision {
 		if (april_cam == null) return Optional.empty();
 		if (!april_cam.isConnected()) return Optional.empty();
 		//if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
-
+		PhotonTrackedTarget tag = april_cam.getLatestResult().getBestTarget();
+		if(tag.getPoseAmbiguity() > 0.5) return Optional.empty(); // Reject pose update if ambiguity is above certain threshold
 		return photonPoseEstimator.update(april_cam.getLatestResult());
 	}
 	// Returns the pose of an AprilTag relative to CAMERA
@@ -71,6 +72,7 @@ public class PhotonVision {
 			//System.out.println("NO TARGETS IN SIGHT");
 			return Optional.empty();
 		}
+
 		return Optional.of(
 				fieldLayout
 				.getTagPose(
