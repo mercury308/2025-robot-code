@@ -1,4 +1,3 @@
-
 package frc.robot.util;
 
 import static frc.robot.constants.Constants.RobotConstants.*;
@@ -87,21 +86,20 @@ public class Util {
 		return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
 	}
 
-	public static double convertAngle(double angle){ //Converts an angle over pi radians into a negative angle
-		if(angle < Math.PI){
+	public static double convertAngle(double angle) { // Converts an angle over pi radians into a negative angle
+		if (angle < Math.PI) {
 			return angle;
-		}
-		else{
-			return angle - (2*Math.PI);
+		} else {
+			return angle - (2 * Math.PI);
 		}
 	}
 
-	public static Pose2d getAdjustedPose(Pose2d target){
+	public static Pose2d getAdjustedPose(Pose2d target) {
 
-       Pose2d returnable = target;
-       Transform2d currentToTarget = new Transform2d(new Translation2d((ROBOT_WIDTH/2)+Units.inchesToMeters(3), 0), new Rotation2d(0)); // 0.06 is offset for stuff in front of the camera
-       return returnable.transformBy(currentToTarget);
-    }
-
-
+		Pose2d returnable = target;
+		Transform2d currentToTarget = new Transform2d(
+				new Translation2d((ROBOT_WIDTH / 2) + Units.inchesToMeters(3), 0),
+				new Rotation2d(0)); // 0.06 is offset for stuff in front of the camera
+		return returnable.transformBy(currentToTarget);
+	}
 }

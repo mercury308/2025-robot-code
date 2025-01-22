@@ -4,12 +4,8 @@ import static frc.robot.RobotContainer.*;
 import static frc.robot.constants.Constants.*;
 import static frc.robot.constants.Constants.RobotConstants.*;
 
-import java.util.function.BiConsumer;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.VecBuilder;
@@ -21,23 +17,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.constants.SwerveModuleConfiguration;
 import frc.robot.util.Util;
-
 import java.io.IOException;
 import java.util.Optional;
-
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
-
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.MedianFilter;
 
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
@@ -54,17 +42,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
 	public SwerveDrivePoseEstimator pose_est;
 
-	public MedianFilter xFilter = new MedianFilter(10);
-	public MedianFilter yFilter = new MedianFilter(10);
-
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
 	 *
 	 * @param init_pose The initial pose of the robot.
 	 */
 	public void init(Pose2d init_pose) {
-		xFilter.reset();
-		yFilter.reset();
 		pose_est = new SwerveDrivePoseEstimator(
 				kinematics,
 				new Rotation2d(imu.yaw()),
@@ -72,7 +55,7 @@ public class SwerveSubsystem extends SubsystemBase {
 				init_pose,
 				VecBuilder.fill(0.1, 0.1, 0.1),
 				VecBuilder.fill(0.5, 0.5, 0.3));
-				
+
 		AutoBuilder.configure(
 				this::getPose,
 				(pose) -> pose_est.resetPosition(new Rotation2d(imu.yaw()), getPositions(), pose),
@@ -125,7 +108,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		desired_speeds = speed;
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(speed);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, SWERVE_MAXSPEED);
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 4; i++) {
 			modules[i].setState(states[i]);
 		}
 	}
@@ -160,7 +143,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
 		Logger.recordOutput("/Odom/x", pose_est.getEstimatedPosition().getX());
 		Logger.recordOutput("/Odom/y", pose_est.getEstimatedPosition().getY());
-		Logger.recordOutput("/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
+		Logger.recordOutput(
+				"/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
 
 		double[] states = new double[8];
 		for (int i = 0; i < 4; i++) states[i * 2 + 1] = modules[i].getTargetState().speedMetersPerSecond;
@@ -172,7 +156,6 @@ public class SwerveSubsystem extends SubsystemBase {
 		for (int i = 0; i < 4; i++)
 			states[i * 2] = modules[i].getMeasuredState().angle.getRadians();
 		Logger.recordOutput("/Swerve/module_speeds", states);
-
 	}
 
 	private Optional<EstimatedRobotPose> est_pos;
@@ -187,7 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
 		est_pos = photon.getEstimatedGlobalPose();
-		
+
 		if (est_pos.isPresent()) {
 			EstimatedRobotPose new_pose = est_pos.get();
 			Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
@@ -215,7 +198,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	public double getYVel() {
 		ChassisSpeeds velocity = getVelocity();
 		double theta = getPose().getRotation().getRadians();
-		return Math.cos(theta) * velocity.vyMetersPerSecond + Math.sin(theta) * velocity.vxMetersPerSecond;
+		return velocity.vxMetersPerSecond * Math.sin(theta) + velocity.vxMetersPerSecond * Math.cos(theta);
 	}
 
 	/**
@@ -228,13 +211,11 @@ public class SwerveSubsystem extends SubsystemBase {
 	public double getXVel() {
 		ChassisSpeeds velocity = drive.getVelocity();
 		double theta = drive.getPose().getRotation().getRadians();
-		return Math.sin(theta) * velocity.vyMetersPerSecond + Math.cos(theta) * velocity.vxMetersPerSecond;
+		return velocity.vxMetersPerSecond * Math.cos(theta) - velocity.vyMetersPerSecond * Math.sin(theta);
 	}
 
-	
-
 	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {
-		PathPlannerPath path  = PathPlannerPath.fromPathFile(fileString);
+		PathPlannerPath path = PathPlannerPath.fromPathFile(fileString);
 		return AutoBuilder.followPath(path);
 	}
 }

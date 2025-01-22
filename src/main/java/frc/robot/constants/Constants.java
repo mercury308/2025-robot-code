@@ -1,11 +1,8 @@
 package frc.robot.constants;
 
-import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -32,34 +29,22 @@ public final class Constants {
 	public static final double MODULE_DRIVE_KF = 0.23;
 	public static final double MODULE_TURN_KP = 3;
 
-	public static double NOTE_VELOCITY = 13.5; // TOO not constant
-
 	public static final double DRIVER_TURN_KP = 1.;
 
 	public static final double CAMERA_HEIGHT = Units.inchesToMeters(13.5);
 
-	public static final int INTAKE_FEEDER_MOTOR = 2;
-	public static final int INTAKE_PIVOT_MOTOR = 14;
-
-	public static final int MIDDLE_BEAM_BREAK_PORT = 3;
-
-	public static final int SHOOTER_ENCODER = 0;
-	public static final double SHOOTER_ENCODER_OFFSET = 0.516 + 0.022;
-	public static final double SHOOTER_HEIGHT = Units.inchesToMeters(15);
-	public static final double TARGET_HEIGHT = Units.inchesToMeters(95);
-
 	public static final PPHolonomicDriveController PATH_FOLLOWER_CONFIG = new PPHolonomicDriveController(
 			new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
 			new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-	);
+			);
 
 	public static RobotConfig ROBOT_CONFIG;
-	static{
-		try{
+
+	static {
+		try {
 			ROBOT_CONFIG = RobotConfig.fromGUISettings();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
 }

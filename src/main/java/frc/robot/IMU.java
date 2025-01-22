@@ -1,4 +1,3 @@
-
 package frc.robot;
 
 import static java.lang.Math.*;
@@ -36,4 +35,3 @@ public class IMU {
 		imu.zeroYaw();
 	}
 }
-	

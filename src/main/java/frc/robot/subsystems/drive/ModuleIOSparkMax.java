@@ -5,15 +5,15 @@ import static frc.robot.constants.Constants.RobotConstants.*;
 import static java.lang.Math.*;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -59,31 +59,25 @@ public class ModuleIOSparkMax implements ModuleIO {
 		drivePID = driveSparkMax.getClosedLoopController();
 		absoluteEncoderOffset = config.offset; // MUST BE CALIBRATED
 		driveSparkMax.clearFaults();
-		turnSparkMax.clearFaults();		
+		turnSparkMax.clearFaults();
 
 		driveSparkMax.setCANTimeout(250);
 		turnSparkMax.setCANTimeout(250);
 
-		// New way of setting up motor configurations 
+		// New way of setting up motor configurations
 
-		driveConfig
-			.smartCurrentLimit(30)
-			.voltageCompensation(12.0);
-		driveConfig.encoder
-			.velocityConversionFactor(Units.rotationsPerMinuteToRadiansPerSecond(1) / DRIVE_GEAR_RATIO * SWERVE_WHEEL_RAD);	
-		driveConfig.closedLoop
-			.p(MODULE_DRIVE_KP)
-			.velocityFF(MODULE_DRIVE_KF);
-	
+		driveConfig.smartCurrentLimit(30).voltageCompensation(12.0);
+		driveConfig.encoder.velocityConversionFactor(
+				Units.rotationsPerMinuteToRadiansPerSecond(1) / DRIVE_GEAR_RATIO * SWERVE_WHEEL_RAD);
+		driveConfig.closedLoop.p(MODULE_DRIVE_KP).velocityFF(MODULE_DRIVE_KF);
 
+		turnConfig.inverted(isTurnMotorInverted).smartCurrentLimit(20).voltageCompensation(12.0);
 		turnConfig
-			.inverted(isTurnMotorInverted)
-			.smartCurrentLimit(20)
-			.voltageCompensation(12.0);
-		turnConfig.encoder
-			.velocityConversionFactor(Units.rotationsPerMinuteToRadiansPerSecond(1) / DRIVE_GEAR_RATIO * SWERVE_WHEEL_RAD)
-			.uvwMeasurementPeriod(10)
-			.uvwAverageDepth(2);
+				.encoder
+				.velocityConversionFactor(
+						Units.rotationsPerMinuteToRadiansPerSecond(1) / DRIVE_GEAR_RATIO * SWERVE_WHEEL_RAD)
+				.uvwMeasurementPeriod(10)
+				.uvwAverageDepth(2);
 
 		driveSparkMax.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 		turnSparkMax.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -96,7 +90,7 @@ public class ModuleIOSparkMax implements ModuleIO {
 
 		driveSparkMax.setCANTimeout(0);
 		turnSparkMax.setCANTimeout(0);
-		//drivePID.setFF(MODULE_DRIVE_KF);
+		// drivePID.setFF(MODULE_DRIVE_KF);
 	}
 
 	@Override
@@ -134,15 +128,13 @@ public class ModuleIOSparkMax implements ModuleIO {
 
 	@Override
 	public void setDriveBrakeMode(boolean enable) {
-		driveConfig
-			.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+		driveConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
 		driveSparkMax.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 	}
 
 	@Override
 	public void setTurnBrakeMode(boolean enable) {
-		turnConfig
-			.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+		turnConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
 		turnSparkMax.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 	}
 
