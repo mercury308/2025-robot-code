@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -98,7 +99,7 @@ public class Util {
 	public static Pose2d getAdjustedPose(Pose2d target){
 
        Pose2d returnable = target;
-       Transform2d currentToTarget = new Transform2d(new Translation2d((ROBOT_WIDTH/2)+0.06, 0), new Rotation2d(Math.PI));
+       Transform2d currentToTarget = new Transform2d(new Translation2d((ROBOT_WIDTH/2)+Units.inchesToMeters(3), 0), new Rotation2d(0)); // 0.06 is offset for stuff in front of the camera
        return returnable.transformBy(currentToTarget);
     }
 

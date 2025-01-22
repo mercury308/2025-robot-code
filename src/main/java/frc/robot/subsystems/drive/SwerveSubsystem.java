@@ -159,9 +159,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		Logger.recordOutput("/Odom/rot", pose_est.getEstimatedPosition().getRotation());
 
 		Logger.recordOutput("/Odom/x", pose_est.getEstimatedPosition().getX());
-		Logger.recordOutput("/Odom/filtered x", xFilter.calculate(pose_est.getEstimatedPosition().getX()));
 		Logger.recordOutput("/Odom/y", pose_est.getEstimatedPosition().getY());
-		Logger.recordOutput("/Odom/filtered y", yFilter.calculate(pose_est.getEstimatedPosition().getY()));
 		Logger.recordOutput("/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
 
 		double[] states = new double[8];
@@ -205,10 +203,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @return the current estimated pose of the robot
 	 */
 	public Pose2d getPose() {
-		Pose2d est_pose = pose_est.getEstimatedPosition();
-		double filtered_x = xFilter.calculate(est_pose.getX());
-		double filtered_y = yFilter.calculate(est_pose.getY());
-		return new Pose2d(filtered_x, filtered_y, est_pose.getRotation());
+		return pose_est.getEstimatedPosition();
 	}
 
 	/**

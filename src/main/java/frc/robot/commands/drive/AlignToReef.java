@@ -25,9 +25,9 @@ public class AlignToReef extends Command{
     
     // TODO: Adjust PID gains
 
-    private PIDController xPID = new PIDController(3, 0, 0.4);
-    private PIDController yPID = new PIDController(5, 0, 0.25);
-    private PIDController wPID = new PIDController(1.4, 0., 0.4);
+    private PIDController xPID = new PIDController(3, 0.1, 0.6);
+    private PIDController yPID = new PIDController(5, 0.2, 0.5);
+    private PIDController wPID = new PIDController(1.5, 0., 0.4);
 
     private Optional<Pose2d> target_pose;
     private Optional<Pose2d> stored_pose = Optional.empty();
@@ -64,7 +64,7 @@ public class AlignToReef extends Command{
         double adj_Y = adj_pose.getY();
 
         double curr_rot = current_pose.getRotation().getRadians();
-        double  target_rot = Math.PI + target_pose.get().getRotation().getRadians();
+        double  target_rot = target_pose.get().getRotation().getRadians();
 
         double vX = MathUtil.clamp(xPID.calculate(curr_X, adj_X), -1, 1); // Have PID adjust current translation to match target
         double vY = MathUtil.clamp(yPID.calculate(curr_Y, adj_Y), -1, 1); // Have PID adjust current translation to match target
@@ -79,23 +79,29 @@ public class AlignToReef extends Command{
 
        // Logger.recordOutput("/Odom/target pose", target_pose.get());
        // Logger.recordOutput("/Swerve/distance", current_pose.getTranslation().getDistance(adj_pose.getTranslation()));
-
-        drive.drive(
-            ChassisSpeeds.fromFieldRelativeSpeeds(vX, vY, vW, drive.getPose().getRotation()) // drive with calculated velocities
-        );
+       if(Math.abs(current_pose.getY() - adj_pose.getY()) > 0.04){
+            drive.drive(
+                ChassisSpeeds.fromFieldRelativeSpeeds(vX, 0, vW, drive.getPose().getRotation()) // drive with calculated velocities
+            );
+       }else if(Math.abs(current_pose.getX() - adj_pose.getX()) > 0.04){
+            drive.drive(
+                ChassisSpeeds.fromFieldRelativeSpeeds(0, vY, 0, drive.getPose().getRotation())
+            );
+       }
         stored_pose = Optional.of(adj_pose); // store current pose for potential future reference
     }
     
     @Override
     public boolean isFinished(){
 
-        if(target_pose.isEmpty()) return false;
+        if(target_pose.isEmpty()){
+            System.out.println("NO TARGET, REPOSITION AND TRY AGAIN");
+            return true;
+        }
 
         Pose2d current_pose = drive.getPose();
-        double dist = Math.abs(
-            current_pose.getTranslation()
-            .getDistance(
-                getAdjustedPose(target_pose.get()).getTranslation())); // Translational difference
+        double dX = Math.abs(current_pose.getX() - adj_pose.getX());
+        double dY = Math.abs(current_pose.getY() - adj_pose.getY()); // Translational difference
        
         double angle_offset =  Math.abs(
             Util.convertAngle(
@@ -108,12 +114,12 @@ public class AlignToReef extends Command{
                 .getRadians())); // Angular difference
 
 
-        if(dist <= 0.1 && angle_offset <= (4*Math.PI)/360){
+        if(dX < 0.04 && dY < 0.04 && angle_offset <= (4*Math.PI)/360){
             System.out.println("Aligned");
             return true;
         }
         
-       // System.out.println("Still working on it    Distance: " + dist + " Angular Dist: " + angle_offset);
+       System.out.println("Still working on it " + " Angular Dist: " + angle_offset);
         return false;
 		
 	}
