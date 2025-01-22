@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.Util;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 
 
 
@@ -33,9 +34,9 @@ public class AlignToReef extends Command{
     private Optional<Pose2d> stored_pose = Optional.empty();
 
     private Pose2d adj_pose;
-
+    
     public AlignToReef(){
-        addRequirements(drive);
+        addRequirements(drive); 
         wPID.enableContinuousInput(0, 2*Math.PI); 
     }   
 
