@@ -28,6 +28,23 @@ public final class Constants {
 		public static final double L2_TURN_RATIO = 7. / 150;
 	}
 
+	public static final class Limelight1Constants {
+
+		public static final double LIMELIGHT_X = Units.inchesToMeters(69); // Placeholder, pls ignore 
+		public static final double LIMELIGHT_Y = Units.inchesToMeters(69); // Placeholder, pls ignore
+		public static final double LIMELIGHT_Z = Units.inchesToMeters(69); // Placeholder, pls ignore
+
+	}
+
+	public static final class Limelight2Constants {
+
+		public static final double LIMELIGHT_X = Units.inchesToMeters(69); // Placeholder, pls ignore 
+		public static final double LIMELIGHT_Y = Units.inchesToMeters(69); // Placeholder, pls ignore
+		public static final double LIMELIGHT_Z = Units.inchesToMeters(69); // Placeholder, pls ignore
+		
+	}
+
+
 	public static final double MODULE_DRIVE_KP = 0.05;
 	public static final double MODULE_DRIVE_KF = 0.23;
 	public static final double MODULE_TURN_KP = 3;
