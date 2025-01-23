@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 
+
 public class LimelightIO implements VisionIO{
 
         private NetworkTableEntry _tx;
@@ -56,7 +57,7 @@ public class LimelightIO implements VisionIO{
         }
 
         @Override
-        
+
         public synchronized void updateInputs(LimelightInputs inputs){
                 inputs.lastTimeStamp = this.lastTimeStamp;
                 inputs.pitch = this.pitchRads;

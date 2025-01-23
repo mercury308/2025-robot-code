@@ -2,6 +2,8 @@ package frc.robot.subsystems.vision;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.epilogue.Logged;
+
 public interface VisionIO {
 
         @AutoLog
