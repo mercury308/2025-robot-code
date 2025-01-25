@@ -1,8 +1,6 @@
 package frc.robot.subsystems.vision;
 import java.util.EnumSet;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -23,7 +21,7 @@ public class LimelightIO implements VisionIO{
         private double yawRads = 0.0;
         private double pitchRads = 0.0;
         private double tagID = -1;
-        private boolean has_taget = false;
+        private boolean has_target = false;
         private double[] pose = new double[6];
 
         public LimelightIO(String limelight){
@@ -44,7 +42,7 @@ public class LimelightIO implements VisionIO{
 
                         synchronized(LimelightIO.this){
                                 this.lastTimeStamp = timeStamp;
-                                has_taget = _validEntry.getDouble(0.0) == 1.0;
+                                has_target = _validEntry.getDouble(0.0) == 1.0;
                                 yawRads = -Units.degreesToRadians(_tx.getDouble(0.0));
                                 pitchRads = Units.degreesToRadians(_ty.getDouble(0.0));
                                 tagID = _id.getDouble(-1.0);
@@ -62,7 +60,7 @@ public class LimelightIO implements VisionIO{
                 inputs.lastTimeStamp = this.lastTimeStamp;
                 inputs.pitch = this.pitchRads;
                 inputs.yaw = this.yawRads;
-                inputs.hasTarget = this.has_taget;
+                inputs.hasTarget = this.has_target;
                 inputs.pose = this.pose;
                 inputs.iD = (int) this.tagID;
         }

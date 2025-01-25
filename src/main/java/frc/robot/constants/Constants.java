@@ -1,11 +1,9 @@
 package frc.robot.constants;
 
-import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
+
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -27,7 +25,7 @@ public final class Constants {
 		public static final double L2_DRIVE_RATIO = 1 / 6.75; // input RPM * gearing = output RPM
 		public static final double L2_TURN_RATIO = 7. / 150;
 	}
-
+	
 	public static final double MODULE_DRIVE_KP = 0.05;
 	public static final double MODULE_DRIVE_KF = 0.23;
 	public static final double MODULE_TURN_KP = 3;
