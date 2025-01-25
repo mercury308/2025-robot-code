@@ -1,17 +1,24 @@
 package frc.robot.commands.drive;
 
-import static frc.robot.RobotContainer.*;
-import static frc.robot.constants.Constants.RobotConstants.*;
-import static frc.robot.util.Util.*;
+import java.util.List;
+import java.util.Optional;
 
-import edu.wpi.first.math.MathUtil;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.photon;
 import frc.robot.util.Util;
-import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
+import static frc.robot.util.Util.getAdjustedPose;
 
 public class AlignToReef extends Command {
 
@@ -19,7 +26,7 @@ public class AlignToReef extends Command {
 
 	private PIDController xPID = new PIDController(3, 0.1, 0.6);
 	private PIDController yPID = new PIDController(5, 0.2, 0.5);
-	private PIDController wPID = new PIDController(1.5, 0., 0.4);
+	private ProfiledPIDController wPID = new ProfiledPIDController(1.5, 0., 0.4, new Constraints(Units.degreesToRadians(540),4*Math.PI));
 
 	private Optional<Pose2d> target_pose;
 	private Optional<Pose2d> stored_pose = Optional.empty();
@@ -60,30 +67,29 @@ public class AlignToReef extends Command {
 		double curr_rot = current_pose.getRotation().getRadians();
 		double target_rot = target_pose.get().getRotation().getRadians();
 
-		double vX = MathUtil.clamp(
-				xPID.calculate(curr_X, adj_X), -1, 1); // Have PID adjust current translation to match target
-		double vY = MathUtil.clamp(
-				yPID.calculate(curr_Y, adj_Y), -1, 1); // Have PID adjust current translation to match target
-		double vW = wPID.calculate(curr_rot, target_rot);
 
 		Logger.recordOutput("/Odom/adjusted pose", adj_pose);
 		Logger.recordOutput("/Odom/adjusted_pose/x", adj_X);
 		Logger.recordOutput("/Odom/adjusted_pose/y", adj_Y);
 		Logger.recordOutput("/Odom/adjusted_pose/w", adj_pose.getRotation().getRadians());
 
-		// Logger.recordOutput("/Odom/target pose", target_pose.get());
-		// Logger.recordOutput("/Swerve/distance",
-		// current_pose.getTranslation().getDistance(adj_pose.getTranslation()));
-		if (Math.abs(current_pose.getY() - adj_pose.getY()) > 0.04) {
-			drive.drive(
-					ChassisSpeeds.fromFieldRelativeSpeeds(
-							vX, 0, vW, drive.getPose().getRotation()) // drive with calculated velocities
-					);
-		} else if (Math.abs(current_pose.getX() - adj_pose.getX()) > 0.04) {
-			drive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-					0, vY, 0, drive.getPose().getRotation()));
-		}
-		stored_pose = Optional.of(adj_pose); // store current pose for potential future reference
+		Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+			current_pose,
+			List.of(),
+			adj_pose,
+			drive.getConfig());
+
+		SwerveControllerCommand swerveCommand = new SwerveControllerCommand(
+			trajectory,
+			drive::getPose, 
+			drive.getKinematics(),
+			xPID,
+			yPID,
+			wPID,
+			drive::setModuleStates,
+		 	drive);
+		
+		swerveCommand.schedule();
 	}
 
 	@Override

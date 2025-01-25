@@ -1,13 +1,17 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.RobotContainer.*;
-import static frc.robot.constants.Constants.*;
-import static frc.robot.constants.Constants.RobotConstants.*;
+import java.io.IOException;
+import java.util.Optional;
+
+import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,15 +21,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
+import static frc.robot.RobotContainer.photon;
+import static frc.robot.constants.Constants.PATH_FOLLOWER_CONFIG;
+import static frc.robot.constants.Constants.ROBOT_CONFIG;
+import static frc.robot.constants.Constants.RobotConstants.ROBOT_LENGTH;
+import static frc.robot.constants.Constants.RobotConstants.ROBOT_WIDTH;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_MAXSPEED;
 import frc.robot.constants.SwerveModuleConfiguration;
 import frc.robot.util.Util;
-import java.io.IOException;
-import java.util.Optional;
-import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
@@ -109,6 +117,13 @@ public class SwerveSubsystem extends SubsystemBase {
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(speed);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, SWERVE_MAXSPEED);
 		for (int i = 0; i < 4; i++) {
+			modules[i].setState(states[i]);
+		}
+	}
+
+	public void setModuleStates(SwerveModuleState[] states){
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, SWERVE_MAXSPEED);
+		for(int i = 0; i < 4; i++){
 			modules[i].setState(states[i]);
 		}
 	}
@@ -212,6 +227,14 @@ public class SwerveSubsystem extends SubsystemBase {
 		ChassisSpeeds velocity = drive.getVelocity();
 		double theta = drive.getPose().getRotation().getRadians();
 		return velocity.vxMetersPerSecond * Math.cos(theta) - velocity.vyMetersPerSecond * Math.sin(theta);
+	}
+
+	public SwerveDriveKinematics getKinematics(){
+		return this.kinematics;	
+	}
+
+	public TrajectoryConfig getConfig(){
+		return new TrajectoryConfig(3.00, 3.00);
 	}
 
 	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {
