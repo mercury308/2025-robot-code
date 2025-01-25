@@ -1,7 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import frc.robot.RobotContainer.*;
-
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
@@ -9,9 +7,10 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
+import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.constants.LimelightConfiguration;
 
 public class VisionSubsystem extends SubsystemBase{
@@ -19,10 +18,10 @@ public class VisionSubsystem extends SubsystemBase{
         private final LimelightConfiguration config;    
         private final LimelightInputsAutoLogged inputs = new LimelightInputsAutoLogged();    
 
-
         private AprilTagFieldLayout field;
-        private Pose2d cameraToApriltag = new Pose2d();
-        private double horizontalDistanceMeters = 0.;
+        private Pose2d robotToApriltag = new Pose2d();
+        private double mt2Timestamp = 0.0;
+        private boolean doRejectUpdate = false;
 
         public VisionSubsystem(VisionIO _io, LimelightConfiguration _config){
                 io = _io;
@@ -33,6 +32,7 @@ public class VisionSubsystem extends SubsystemBase{
                         System.out.println("COULDNT FIND APRILTAG FIELD LAYOUT");
                         e.printStackTrace();
                 }       
+                LimelightHelpers.SetRobotOrientation(config.Name, RobotState.getPose().getRotation().getDegrees(), 0,0,0,0,0);
         }        
 
         @Override
@@ -41,38 +41,18 @@ public class VisionSubsystem extends SubsystemBase{
                 io.updateInputs(inputs);
                 Logger.processInputs(config.Name, inputs);
 
-                cameraToApriltag = null;
-                horizontalDistanceMeters = Double.NaN;
+                LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.Name);
+                if(Math.abs(imu.getAngularVelocity()) > 720){
+                        doRejectUpdate = true;
+                }else if(!hasTarget()){
+                        doRejectUpdate = true;
+                }
 
-                if(hasTarget()){
-                        double _yaw = getYawRadians();
-                        double _pitch = getPitchRadians();
-                        Optional<Pose3d> tag_pose = field.getTagPose((int) inputs.iD);
-
-                        if(!tag_pose.isEmpty()){
-
-                                Pose3d pose = tag_pose.get();
-                                double tag_z = pose.getZ() - config.LimelightHeightOffsetMeters;
-                                double tag_y = pose.getY() - config.LimelightLengthOffsetMeters;
-                                double tag_x = pose.getX() - config.LimelightWidthOffsetMeters;
-
-                                horizontalDistanceMeters = tag_z/Math.tan(_pitch);
-
-                                cameraToApriltag = new Pose2d(
-                                        horizontalDistanceMeters * Math.cos(_yaw),
-                                        horizontalDistanceMeters * Math.sin(_yaw),
-                                        new Rotation2d(_yaw)
-                                );
-
-
-
-                        }
-
-                        drive.pose_est.addVisionMeasurement(cameraToApriltag);
-
-
-                }       
-
+                if(!doRejectUpdate){
+                        robotToApriltag = mt2.pose;
+                        mt2Timestamp = mt2.timestampSeconds;
+                }
+                
 
         }
 
@@ -88,9 +68,13 @@ public class VisionSubsystem extends SubsystemBase{
                 return inputs.pitch;
         }
 
-        public double getHorizontalDistance(){
-                return horizontalDistanceMeters;
+        public Optional<Pose2d> getEstimatePose(){
+                return Optional.of(this.robotToApriltag);
         }
 
+        public Optional<Double> getLastMT2Timestamp(){
+                return Optional.of(this.mt2Timestamp);
+        }
+        
 
 }

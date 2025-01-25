@@ -1,17 +1,17 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.RobotContainer.*;
-import static frc.robot.constants.Constants.*;
-import static frc.robot.constants.Constants.RobotConstants.*;
+import java.io.IOException;
+import java.util.Optional;
 
-import java.util.function.BiConsumer;
+import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
+
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,24 +21,19 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
-import frc.robot.Robot;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
+import static frc.robot.constants.Constants.PATH_FOLLOWER_CONFIG;
+import static frc.robot.constants.Constants.ROBOT_CONFIG;
+import static frc.robot.constants.Constants.RobotConstants.ROBOT_LENGTH;
+import static frc.robot.constants.Constants.RobotConstants.ROBOT_WIDTH;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_MAXSPEED;
 import frc.robot.constants.SwerveModuleConfiguration;
 import frc.robot.util.Util;
-
-import java.io.IOException;
-import java.util.Optional;
-
-import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
-
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.MedianFilter;
 
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
@@ -54,23 +49,16 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2));
 
 	public SwerveDrivePoseEstimator pose_est;
-	public boolean doRejectUpdate = false;
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
 	 *
 	 * @param init_pose The initial pose of the robot.
 	 */
 	public void init(Pose2d init_pose) {
-		pose_est = new SwerveDrivePoseEstimator(
-				kinematics,
-				new Rotation2d(imu.yaw()),
-				getPositions(),
-				init_pose,
-				VecBuilder.fill(0.1, 0.1, 0.1),
-				VecBuilder.fill(0.5, 0.5, 0.3));
+		pose_est = RobotState.pose_est;
 				
 		AutoBuilder.configure(
-				this::getPose,
+				RobotState.getPose(),
 				(pose) -> pose_est.resetPosition(new Rotation2d(imu.yaw()), getPositions(), pose),
 				this::getVelocity,
 				this::drive,
@@ -86,7 +74,6 @@ public class SwerveSubsystem extends SubsystemBase {
 			Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
 		});
 
-		LimelightHelpers.SetRobotOrientation("limelight", pose_est.getEstimatedPosition().getRotation().getDegrees(),0,0,0,0,0);
 	}
 
 	/**
@@ -153,13 +140,6 @@ public class SwerveSubsystem extends SubsystemBase {
 				"/Swerve/speeds",
 				new double[] {speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond});
 
-		Logger.recordOutput("/Odom/pose", getPose());
-		Logger.recordOutput("/Odom/rot", pose_est.getEstimatedPosition().getRotation());
-
-		Logger.recordOutput("/Odom/x", pose_est.getEstimatedPosition().getX());
-		Logger.recordOutput("/Odom/y", pose_est.getEstimatedPosition().getY());
-		Logger.recordOutput("/Odom/rot_raw", pose_est.getEstimatedPosition().getRotation().getRadians());
-
 		double[] states = new double[8];
 		for (int i = 0; i < 4; i++) states[i * 2 + 1] = modules[i].getTargetState().speedMetersPerSecond;
 		for (int i = 0; i < 4; i++)
@@ -180,35 +160,13 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * This method is called repeatedly to perform necessary updates and calculations.
 	 * It updates the pose estimation, vision measurements, and logging.
 	 */
-	public void periodic() {
-		for (SwerveModule module : modules) module.periodic();
-		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
-		LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-		if(Math.abs(imu.getAngularVelocity()) > 720){
-			doRejectUpdate = true;
-		}
-		if(mt2.tagCount == 0){
-			doRejectUpdate = true;
-		}
-		if(!doRejectUpdate){
-			pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,99999999));
-			pose_est.addVisionMeasurement(
-				mt2.pose,
-				mt2.timestampSeconds);
-		}
-		updateLogging();
-	}
 
 	/**
 	 * Returns the current estimated pose of the robot.
 	 *
 	 * @return the current estimated pose of the robot
 	 */
-	public Pose2d getPose() {
-		Pose2d est_pose = pose_est.getEstimatedPosition();
-		return est_pose;
-	}
 
 	/**
 	 * Returns the field oriented Y velocity of the robot in meters per second.
@@ -218,7 +176,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public double getYVel() {
 		ChassisSpeeds velocity = getVelocity();
-		double theta = getPose().getRotation().getRadians();
+		double theta = RobotState.getPose().getRotation().getRadians();
 		return Math.cos(theta) * velocity.vyMetersPerSecond + Math.sin(theta) * velocity.vxMetersPerSecond;
 	}
 
@@ -231,7 +189,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 */
 	public double getXVel() {
 		ChassisSpeeds velocity = drive.getVelocity();
-		double theta = drive.getPose().getRotation().getRadians();
+		double theta = RobotState.getPose().getRotation().getRadians();
 		return Math.sin(theta) * velocity.vyMetersPerSecond + Math.cos(theta) * velocity.vxMetersPerSecond;
 	}
 
