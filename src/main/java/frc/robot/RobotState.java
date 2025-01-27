@@ -17,11 +17,13 @@ public class RobotState {
         private VisionSubsystem vision;
         private Pose2d init_pose;
         private IMU imu;
+        private static RobotState instance;
 
-        public RobotState(SwerveSubsystem _drive, VisionSubsystem _vision, Pose2d _init_pose){
+        public RobotState(SwerveSubsystem _drive, VisionSubsystem _vision, Pose2d _init_pose, IMU _imu){
                 drive = _drive;
                 vision = _vision;
                 init_pose = _init_pose;
+                imu = _imi
 
                 pose_est = new SwerveDrivePoseEstimator(
                         drive.kinematics,

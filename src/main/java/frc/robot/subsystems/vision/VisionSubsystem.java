@@ -23,6 +23,7 @@ public class VisionSubsystem extends SubsystemBase{
         private double mt2Timestamp = 0.0;
         private boolean doRejectUpdate = false;
 
+
         public VisionSubsystem(VisionIO _io, LimelightConfiguration _config){
                 io = _io;
                 config = _config;
