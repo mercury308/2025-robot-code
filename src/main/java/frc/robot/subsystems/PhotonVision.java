@@ -16,14 +16,29 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class PhotonVision {
-	private PhotonCamera april_cam;
+	private PhotonCamera april_cam1;
+	private PhotonCamera april_cam2;
+	private PhotonCamera april_cam3;
+
+
 	AprilTagFieldLayout fieldLayout;
 
-	Transform3d robotToCam = new Transform3d(
+	Transform3d robotToCam1 = new Transform3d(
 			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
 			new Rotation3d(0, Units.degreesToRadians(180), 0));
-	PhotonPoseEstimator photonPoseEstimator;
+	Transform3d robotToCam2 = new Transform3d(
+			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
+			new Rotation3d(0, Units.degreesToRadians(180), 0));
+	Transform3d robotToCam3 = new Transform3d(
+			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
+			new Rotation3d(0, Units.degreesToRadians(180), 0));
 
+			
+	PhotonPoseEstimator photonPoseEstimator1;
+	PhotonPoseEstimator photonPoseEstimator2;
+	PhotonPoseEstimator photonPoseEstimator3;
+
+	
 	//	private Pose2d camRobot = new Pose2d(Units.inchesToMeters(0), Units.inchesToMeters(11), new Rotation2d());
 
 	public PhotonVision() {
@@ -34,21 +49,22 @@ public class PhotonVision {
 			e.printStackTrace();
 		}
 
-		// note_cam = new PhotonCamera("Global_Shutter_Camera (1)");
+		april_cam1 = new PhotonCamera("Global_Shutter_Camera");
+		april_cam2 = new PhotonCamera("Global_Shutter_Camera (1)");
+		april_cam3 = new PhotonCamera("Global_Shutter_Camera (2)");
 
-		april_cam = new PhotonCamera("Global_Shutter_Camera");
-		photonPoseEstimator =
-				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
-		photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+		photonPoseEstimator1 =
+				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam1);
+		photonPoseEstimator1.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+		photonPoseEstimator2 =
+				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam2);
+		photonPoseEstimator2.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+		photonPoseEstimator3 =
+				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam3);
+		photonPoseEstimator3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 	}
-
-	/**
-	 * Returns an optional EstimatedRobotPose object representing the estimated global pose of the robot.
-	 * If the April camera is not available, not connected, or does not detect at least 2 targets, an empty optional is returned.
-	 *
-	 * @return an optional EstimatedRobotPose object representing the estimated global pose of the robot, or an empty optional if the pose cannot be estimated
-	 */
-	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+	
+	private Optional<EstimatedRobotPose> getEstimate(PhotonCamera april_cam, PhotonPoseEstimator photonPoseEstimator){
 		if (april_cam == null) return Optional.empty();
 		if (!april_cam.isConnected()) return Optional.empty();
 		// if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
@@ -58,13 +74,23 @@ public class PhotonVision {
 			return Optional.empty(); // Reject pose update if ambiguity is above certain threshold
 		return photonPoseEstimator.update(april_cam.getLatestResult());
 	}
+
+	/**
+	 * Returns an optional EstimatedRobotPose object representing the estimated global pose of the robot.
+	 * If the April camera is not available, not connected, or does not detect at least 2 targets, an empty optional is returned.
+	 *
+	 * @return an optional EstimatedRobotPose object representing the estimated global pose of the robot, or an empty optional if the pose cannot be estimated
+	 */
+	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+		return Optional.empty();
+	}
 	// Returns the pose of an AprilTag relative to CAMERA
 	public Optional<Pose2d> getAprilTagPose() {
-		if (april_cam == null) return Optional.empty();
-		if (!april_cam.isConnected()) return Optional.empty();
+		if (april_cam1 == null) return Optional.empty();
+		if (!april_cam1.isConnected()) return Optional.empty();
 		// if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
 
-		PhotonTrackedTarget target = april_cam.getLatestResult().getBestTarget();
+		PhotonTrackedTarget target = april_cam1.getLatestResult().getBestTarget();
 		if (target == null) {
 			// System.out.println("NO TARGETS IN SIGHT");
 			return Optional.empty();
