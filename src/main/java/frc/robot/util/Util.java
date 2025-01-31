@@ -108,7 +108,7 @@ public class Util {
 
 		Pose2d returnable = target;
 		Transform2d currentToTarget = new Transform2d(
-				new Translation2d((ROBOT_WIDTH / 2) + Units.inchesToMeters(3), 0),
+				new Translation2d((ROBOT_WIDTH / 2) + Units.inchesToMeters(3+4.5), 0),
 				new Rotation2d(0)); // 0.06 is offset for stuff in front of the camera
 		return returnable.transformBy(currentToTarget);
 	}

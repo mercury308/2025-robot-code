@@ -1,20 +1,13 @@
 package frc.robot.commands.drive;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import static frc.robot.RobotContainer.drive;
 import static frc.robot.RobotContainer.photon;
 import frc.robot.util.Util;
@@ -24,9 +17,9 @@ public class AlignToReef extends Command {
 
 	// TODO: Adjust PID gains
 
-	private PIDController xPID = new PIDController(3, 0.1, 0.6);
-	private PIDController yPID = new PIDController(5, 0.2, 0.5);
-	private ProfiledPIDController wPID = new ProfiledPIDController(1.5, 0., 0.4, new Constraints(Units.degreesToRadians(540),4*Math.PI));
+	private PIDController xPID = new PIDController(1.25, 0, 0);
+	private PIDController yPID = new PIDController(1.25, 0, 0);
+	private PIDController wPID = new PIDController(1.5, 0., 0.4);
 
 	private Optional<Pose2d> target_pose;
 	private Optional<Pose2d> stored_pose = Optional.empty();
@@ -40,7 +33,9 @@ public class AlignToReef extends Command {
 
 	@Override
 	public void initialize() {
-		target_pose = photon.getAprilTagPose();
+		// target_pose = photon.getAprilTagPose();
+		// target_pose = photon.getAprilTagPose(20);
+		target_pose = photon.getAprilTagPose(22);
 		if (target_pose.isEmpty()
 				&& stored_pose
 						.isEmpty()) { // For reliability, if not receiving new pose from PhotonVision, use previously
@@ -72,24 +67,13 @@ public class AlignToReef extends Command {
 		Logger.recordOutput("/Odom/adjusted_pose/x", adj_X);
 		Logger.recordOutput("/Odom/adjusted_pose/y", adj_Y);
 		Logger.recordOutput("/Odom/adjusted_pose/w", adj_pose.getRotation().getRadians());
-
-		Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-			current_pose,
-			List.of(),
-			adj_pose,
-			drive.getConfig());
-
-		SwerveControllerCommand swerveCommand = new SwerveControllerCommand(
-			trajectory,
-			drive::getPose, 
-			drive.getKinematics(),
-			xPID,
-			yPID,
-			wPID,
-			drive::setModuleStates,
-		 	drive);
 		
-		swerveCommand.schedule();
+		double xVel = xPID.calculate(curr_X, adj_X);
+		double yVel = xPID.calculate(curr_Y, adj_Y);
+		double wVel = xPID.calculate(curr_rot, target_rot);
+
+		drive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, wVel, drive.getPose().getRotation()));
+
 	}
 
 	@Override

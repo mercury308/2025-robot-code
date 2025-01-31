@@ -24,7 +24,7 @@ public class PhotonVision {
 	AprilTagFieldLayout fieldLayout;
 
 	Transform3d robotToCam1 = new Transform3d(
-			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
+			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(10)),
 			new Rotation3d(0, Units.degreesToRadians(180), 0));
 	Transform3d robotToCam2 = new Transform3d(
 			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
@@ -82,20 +82,21 @@ public class PhotonVision {
 	 * @return an optional EstimatedRobotPose object representing the estimated global pose of the robot, or an empty optional if the pose cannot be estimated
 	 */
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-		return Optional.empty();
+		return getEstimate(april_cam1, photonPoseEstimator1);
 	}
 	// Returns the pose of an AprilTag relative to CAMERA
-	public Optional<Pose2d> getAprilTagPose() {
-		if (april_cam1 == null) return Optional.empty();
-		if (!april_cam1.isConnected()) return Optional.empty();
-		// if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
+	public Optional<Pose2d> getAprilTagPose(int id) {
+		// if (april_cam1 == null) return Optional.empty();
+		// if (!april_cam1.isConnected()) return Optional.empty();
+		// // if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
 
-		PhotonTrackedTarget target = april_cam1.getLatestResult().getBestTarget();
-		if (target == null) {
-			// System.out.println("NO TARGETS IN SIGHT");
-			return Optional.empty();
-		}
+		// PhotonTrackedTarget target = april_cam1.getLatestResult().getBestTarget();
+		// if (target == null) {
+		// 	// System.out.println("NO TARGETS IN SIGHT");
+		// 	return Optional.empty();
+		// }
 
-		return Optional.of(fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d());
+		// return Optional.of(fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d());
+		return Optional.of(fieldLayout.getTagPose(id).get().toPose2d());
 	}
 }
