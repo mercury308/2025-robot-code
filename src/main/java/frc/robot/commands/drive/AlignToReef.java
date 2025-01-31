@@ -23,19 +23,21 @@ public class AlignToReef extends Command {
 
 	private Optional<Pose2d> target_pose;
 	private Optional<Pose2d> stored_pose = Optional.empty();
+	private int target_id;
 
 	private Pose2d adj_pose;
 
-	public AlignToReef() {
+	public AlignToReef(int target_id) {
 		addRequirements(drive);
 		wPID.enableContinuousInput(0, 2 * Math.PI);
+		this.target_id = target_id;
 	}
 
 	@Override
 	public void initialize() {
 		// target_pose = photon.getAprilTagPose();
 		// target_pose = photon.getAprilTagPose(20);
-		target_pose = photon.getAprilTagPose(22);
+		target_pose = photon.getAprilTagPose(target_id);
 		if (target_pose.isEmpty()
 				&& stored_pose
 						.isEmpty()) { // For reliability, if not receiving new pose from PhotonVision, use previously

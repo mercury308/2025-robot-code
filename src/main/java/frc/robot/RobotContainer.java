@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Set;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -7,6 +9,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.drive.AlignToReef;
 import frc.robot.commands.drive.DefaultDrive;
@@ -28,7 +31,6 @@ public class RobotContainer {
 	public RobotContainer() {}
 
 	public static void initSubsystems() {
-		configureBindings();
 
 		drive.setDefaultCommand(new DefaultDrive(() -> left_js.getY(), () -> left_js.getX(), () -> -right_js.getX()));
 		drive.init(new Pose2d());
@@ -36,10 +38,17 @@ public class RobotContainer {
 		Pathfinding.setPathfinder(new LocalADStarAK());
     		autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
 
+		autoChooser.addOption("Goto Tag 20", new AlignToReef(20));
+		autoChooser.addOption("Goto Tag 21", new AlignToReef(21));
+		autoChooser.addOption("Goto Tag 22", new AlignToReef(22));
+
+		configureBindings();
 	}
 
 	private static void configureBindings() {
-		right_js.button(4).onTrue(new AlignToReef());
+		// right_js.button(4).onTrue(new AlignToReef(21));
+		right_js.button(4).onTrue(new DeferredCommand(() -> autoChooser.get(), Set.of(drive)));
+
 	}
 
 	public Command getAutonomousCommand() {
