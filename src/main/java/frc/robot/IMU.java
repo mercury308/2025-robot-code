@@ -35,8 +35,7 @@ public class IMU {
 		imu.zeroYaw();
 	}
 
-	public double getAngularVelocity(){
+	public double getAngularVelocity() {
 		return imu.getRate();
 	}
-
 }

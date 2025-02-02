@@ -17,6 +17,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -49,6 +50,8 @@ public class SwerveSubsystem extends SubsystemBase {
 			new Translation2d(-ROBOT_LENGTH / 2, -ROBOT_WIDTH / 2));
 
 	public SwerveDrivePoseEstimator pose_est;
+	public final double POSE_BUFFER_SIZE_SECONDS = 2.;
+	TimeInterpolatableBuffer<Pose2d> pose_buffer = TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_SIZE_SECONDS);
 
 	/**
 	 * Initializes the SwerveSubsystem with the given initial pose.
@@ -80,7 +83,6 @@ public class SwerveSubsystem extends SubsystemBase {
 		PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
 			Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
 		});
-
 	}
 
 	/**
@@ -122,9 +124,9 @@ public class SwerveSubsystem extends SubsystemBase {
 		}
 	}
 
-	public void setModuleStates(SwerveModuleState[] states){
+	public void setModuleStates(SwerveModuleState[] states) {
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, SWERVE_MAXSPEED);
-		for(int i = 0; i < 4; i++){
+		for (int i = 0; i < 4; i++) {
 			modules[i].setState(states[i]);
 		}
 	}
@@ -230,11 +232,11 @@ public class SwerveSubsystem extends SubsystemBase {
 		return velocity.vxMetersPerSecond * Math.cos(theta) - velocity.vyMetersPerSecond * Math.sin(theta);
 	}
 
-	public SwerveDriveKinematics getKinematics(){
-		return this.kinematics;	
+	public SwerveDriveKinematics getKinematics() {
+		return this.kinematics;
 	}
 
-	public TrajectoryConfig getConfig(){
+	public TrajectoryConfig getConfig() {
 		return new TrajectoryConfig(3.00, 3.00);
 	}
 
@@ -243,8 +245,11 @@ public class SwerveSubsystem extends SubsystemBase {
 		return AutoBuilder.followPath(path);
 	}
 
-	public void addLimelightMeasurement(Pose2d est, double timeStamp){
-		pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+	public void addLimelightMeasurement(Pose2d est, double timeStamp) {
+		//pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+		Pose2d previousPose = pose_buffer.getSample(timeStamp).get();
 		pose_est.addVisionMeasurement(est, timeStamp);
 	}
+
+
 }

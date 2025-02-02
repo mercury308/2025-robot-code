@@ -1,17 +1,16 @@
 package frc.robot.commands.drive;
 
-import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.photon;
+import static frc.robot.util.Util.getAdjustedPose;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.photon;
 import frc.robot.util.Util;
-import static frc.robot.util.Util.getAdjustedPose;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class AlignToReef extends Command {
 
@@ -64,18 +63,17 @@ public class AlignToReef extends Command {
 		double curr_rot = current_pose.getRotation().getRadians();
 		double target_rot = target_pose.get().getRotation().getRadians();
 
-
 		Logger.recordOutput("/Odom/adjusted pose", adj_pose);
 		Logger.recordOutput("/Odom/adjusted_pose/x", adj_X);
 		Logger.recordOutput("/Odom/adjusted_pose/y", adj_Y);
 		Logger.recordOutput("/Odom/adjusted_pose/w", adj_pose.getRotation().getRadians());
-		
+
 		double xVel = xPID.calculate(curr_X, adj_X);
 		double yVel = xPID.calculate(curr_Y, adj_Y);
 		double wVel = xPID.calculate(curr_rot, target_rot);
 
-		drive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xVel, yVel, wVel, drive.getPose().getRotation()));
-
+		drive.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+				xVel, yVel, wVel, drive.getPose().getRotation()));
 	}
 
 	@Override

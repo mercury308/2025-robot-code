@@ -26,7 +26,7 @@ import static frc.robot.constants.Constants.RobotConstants.TURBO_SPEED_MULT;
 public class Util {
 	// tuned value for sigmoid, higher values make the curve steeper, this is what thomas likes. Use desmos to preview
 	// curves
-	private static double a = 3;
+	private static double a = 2;
 
 	/**
 	 * Applies a sensitivity curve to a given input value.
@@ -108,10 +108,8 @@ public class Util {
 
 		Pose2d returnable = target;
 		Transform2d currentToTarget = new Transform2d(
-				new Translation2d((ROBOT_WIDTH / 2) + Units.inchesToMeters(3+4.5), 0),
+				new Translation2d((ROBOT_WIDTH / 2) + Units.inchesToMeters(3 + 4.5), 0),
 				new Rotation2d(0)); // 0.06 is offset for stuff in front of the camera
 		return returnable.transformBy(currentToTarget);
 	}
-
-
 }

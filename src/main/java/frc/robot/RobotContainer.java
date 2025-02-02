@@ -18,6 +18,7 @@ import frc.robot.subsystems.vision.PhotonVision;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.util.LocalADStarAK;
 
+
 public class RobotContainer {
 	public static SwerveSubsystem drive = new SwerveSubsystem();
 	public static IMU imu = new IMU();
@@ -39,7 +40,7 @@ public class RobotContainer {
 		limelight.init();
 
 		Pathfinding.setPathfinder(new LocalADStarAK());
-    		autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
+		autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());
 
 		autoChooser.addOption("Goto Tag 20", new AlignToReef(20));
 		autoChooser.addOption("Goto Tag 21", new AlignToReef(21));
@@ -51,7 +52,6 @@ public class RobotContainer {
 	private static void configureBindings() {
 		// right_js.button(4).onTrue(new AlignToReef(21));
 		right_js.button(4).onTrue(new DeferredCommand(() -> autoChooser.get(), Set.of(drive)));
-
 	}
 
 	public Command getAutonomousCommand() {

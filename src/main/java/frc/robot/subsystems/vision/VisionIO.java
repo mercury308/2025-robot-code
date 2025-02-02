@@ -2,37 +2,33 @@ package frc.robot.subsystems.vision;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.epilogue.Logged;
-
 public interface VisionIO {
 
-        @AutoLog
-        public static class LimelightInputs{
+	@AutoLog
+	public static class LimelightInputs {
 
-                // double representing time since last update to IO
+		// double representing time since last update to IO
 
-                public double lastTimeStamp = 0.0;
+		public double lastTimeStamp = 0.0;
 
-                // boolean representing whether or not target is in sight
+		// boolean representing whether or not target is in sight
 
-                public boolean hasTarget = false;
-        
-                // double representing pitch from camera lens to target in radians
+		public boolean hasTarget = false;
 
-                public double pitch = 0.0;
+		// double representing pitch from camera lens to target in radians
 
-                // double representing yaw from camera lens to target in radians
+		public double pitch = 0.0;
 
-                public double yaw = 0.0;
+		// double representing yaw from camera lens to target in radians
 
-                // int representing fiducial ID of target 
+		public double yaw = 0.0;
 
-                public int iD = -1;
+		// int representing fiducial ID of target
 
-                public double[] pose;
+		public int iD = -1;
 
-        }
+		public double[] pose;
+	}
 
-        public default void updateInputs(LimelightInputs inputs){}
-
+	public default void updateInputs(LimelightInputs inputs) {}
 }

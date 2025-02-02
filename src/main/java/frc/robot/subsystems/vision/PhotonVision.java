@@ -20,7 +20,6 @@ public class PhotonVision {
 	private PhotonCamera april_cam2;
 	private PhotonCamera april_cam3;
 
-
 	AprilTagFieldLayout fieldLayout;
 
 	Transform3d robotToCam1 = new Transform3d(
@@ -33,12 +32,10 @@ public class PhotonVision {
 			new Translation3d(Units.inchesToMeters(-15), Units.inchesToMeters(4.5), Units.inchesToMeters(11)),
 			new Rotation3d(0, Units.degreesToRadians(180), 0));
 
-			
 	PhotonPoseEstimator photonPoseEstimator1;
 	PhotonPoseEstimator photonPoseEstimator2;
 	PhotonPoseEstimator photonPoseEstimator3;
 
-	
 	//	private Pose2d camRobot = new Pose2d(Units.inchesToMeters(0), Units.inchesToMeters(11), new Rotation2d());
 
 	public PhotonVision() {
@@ -63,8 +60,8 @@ public class PhotonVision {
 				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam3);
 		photonPoseEstimator3.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 	}
-	
-	private Optional<EstimatedRobotPose> getEstimate(PhotonCamera april_cam, PhotonPoseEstimator photonPoseEstimator){
+
+	private Optional<EstimatedRobotPose> getEstimate(PhotonCamera april_cam, PhotonPoseEstimator photonPoseEstimator) {
 		if (april_cam == null) return Optional.empty();
 		if (!april_cam.isConnected()) return Optional.empty();
 		// if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
