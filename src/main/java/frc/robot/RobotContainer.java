@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import frc.robot.commands.drive.AlignToReef;
 import frc.robot.commands.drive.DefaultDrive;
-import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.drive.SwerveSubsystem;
+import frc.robot.subsystems.vision.PhotonVision;
 import frc.robot.util.LocalADStarAK;
 
 public class RobotContainer {
