@@ -7,13 +7,6 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
@@ -248,5 +241,10 @@ public class SwerveSubsystem extends SubsystemBase {
 	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {
 		PathPlannerPath path = PathPlannerPath.fromPathFile(fileString);
 		return AutoBuilder.followPath(path);
+	}
+
+	public void addLimelightMeasurement(Pose2d est, double timeStamp){
+		pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+		pose_est.addVisionMeasurement(est, timeStamp);
 	}
 }

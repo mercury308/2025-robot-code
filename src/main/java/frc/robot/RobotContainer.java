@@ -1,10 +1,5 @@
 package frc.robot;
 
-import frc.robot.commands.drive.DefaultDrive;
-import frc.robot.subsystems.drive.SwerveSubsystem;
-import frc.robot.commands.drive.AlignToReef;
-import frc.robot.util.LocalADStarAK;
-
 import java.util.Set;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -20,12 +15,14 @@ import frc.robot.commands.drive.AlignToReef;
 import frc.robot.commands.drive.DefaultDrive;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.PhotonVision;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.util.LocalADStarAK;
 
 public class RobotContainer {
 	public static SwerveSubsystem drive = new SwerveSubsystem();
 	public static IMU imu = new IMU();
 	public static PhotonVision photon = new PhotonVision();
+	public static VisionSubsystem limelight = new VisionSubsystem();
 
 	public static CommandJoystick left_js = new CommandJoystick(4);
 	public static CommandJoystick right_js = new CommandJoystick(3);
@@ -39,6 +36,7 @@ public class RobotContainer {
 
 		drive.setDefaultCommand(new DefaultDrive(() -> left_js.getY(), () -> left_js.getX(), () -> -right_js.getX()));
 		drive.init(new Pose2d());
+		limelight.init();
 
 		Pathfinding.setPathfinder(new LocalADStarAK());
     		autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser());

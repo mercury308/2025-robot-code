@@ -5,16 +5,15 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
-import frc.robot.Robot;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
 import frc.robot.constants.LimelightConfiguration;
-
 public class VisionSubsystem extends SubsystemBase{
-        private final VisionIO io;
-        private final LimelightConfiguration config;    
+        private LimelightIO io;
+        private LimelightConfiguration config;    
         private final LimelightInputsAutoLogged inputs = new LimelightInputsAutoLogged();    
 
         private AprilTagFieldLayout field;
@@ -22,18 +21,12 @@ public class VisionSubsystem extends SubsystemBase{
         private double mt2Timestamp = 0.0;
         private boolean doRejectUpdate = false;
 
-
-        public VisionSubsystem(VisionIO _io, LimelightConfiguration _config){
-                io = _io;
-                config = _config;
-                try {
-                        field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-                } catch (Exception e) {
-                        System.out.println("COULDNT FIND APRILTAG FIELD LAYOUT");
-                        e.printStackTrace();
-                }       
-                LimelightHelpers.SetRobotOrientation(config.Name, RobotState.getPose().getRotation().getDegrees(), 0,0,0,0,0);
+        public void init(){;
+                config = new LimelightConfiguration();
+                io = new LimelightIO(config.Name);  
+                LimelightHelpers.SetRobotOrientation(config.Name, drive.getPose().getRotation().getDegrees(), 0,0,0,0,0);
         }        
+
 
         @Override
 
@@ -51,6 +44,7 @@ public class VisionSubsystem extends SubsystemBase{
                 if(!doRejectUpdate){
                         robotToApriltag = mt2.pose;
                         mt2Timestamp = mt2.timestampSeconds;
+                        drive.addLimelightMeasurement(robotToApriltag, mt2Timestamp);
                 }
                 
 
@@ -72,9 +66,5 @@ public class VisionSubsystem extends SubsystemBase{
                 return Optional.of(this.robotToApriltag);
         }
 
-        public Optional<Double> getLastMT2Timestamp(){
-                return Optional.of(this.mt2Timestamp);
-        }
         
-
 }
