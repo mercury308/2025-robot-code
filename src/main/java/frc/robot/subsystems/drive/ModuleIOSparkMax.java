@@ -1,8 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.constants.Constants.*;
-import static frc.robot.constants.Constants.RobotConstants.*;
-import static java.lang.Math.*;
+import static java.lang.Math.PI;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
@@ -14,9 +12,15 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import static frc.robot.constants.Constants.MODULE_DRIVE_KF;
+import static frc.robot.constants.Constants.MODULE_DRIVE_KP;
+import static frc.robot.constants.Constants.RobotConstants.L3_DRIVE_RATIO;
+import static frc.robot.constants.Constants.RobotConstants.L3_TURN_RATIO;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_WHEEL_RAD;
 import frc.robot.constants.SwerveModuleConfiguration;
 
 /**
@@ -33,8 +37,8 @@ import frc.robot.constants.SwerveModuleConfiguration;
  */
 public class ModuleIOSparkMax implements ModuleIO {
 	// Gear ratios for SDS MK4i L2, adjust as necessary
-	private static final double DRIVE_GEAR_RATIO = 1 / L2_DRIVE_RATIO;
-	private static final double TURN_GEAR_RATIO = 1 / L2_TURN_RATIO;
+	private static final double DRIVE_GEAR_RATIO = 1 / L3_DRIVE_RATIO;
+	private static final double TURN_GEAR_RATIO = 1 / L3_TURN_RATIO;
 
 	private final SparkMax driveSparkMax;
 	private final SparkMax turnSparkMax;

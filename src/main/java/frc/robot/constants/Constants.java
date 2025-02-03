@@ -3,6 +3,7 @@ package frc.robot.constants;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -21,8 +22,8 @@ public final class Constants {
 		public static final double TURBO_ANGULAR_SPEED_MULT = 1;
 
 		public static final double SWERVE_WHEEL_RAD = 2 * 2.54 / 100;
-		public static final double L2_DRIVE_RATIO = 1 / 6.75; // input RPM * gearing = output RPM
-		public static final double L2_TURN_RATIO = 7. / 150;
+		public static final double L3_DRIVE_RATIO = 1 / 6.12; // input RPM * gearing = output RPM
+		public static final double L3_TURN_RATIO = 1/12.8;
 	}
 
 	public static final double MODULE_DRIVE_KP = 0.05;

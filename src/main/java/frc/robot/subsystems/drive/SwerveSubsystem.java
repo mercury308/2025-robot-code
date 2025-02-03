@@ -244,9 +244,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		PathPlannerPath path = PathPlannerPath.fromPathFile(fileString);
 		return AutoBuilder.followPath(path);
 	}
-
+	// TODO: Compensate for latency 
 	public void addLimelightMeasurement(Pose2d est, double timeStamp) {
-		//pose_est.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
 		Pose2d previousPose = pose_buffer.getSample(timeStamp).get();
 		pose_est.addVisionMeasurement(est, timeStamp);
 	}
