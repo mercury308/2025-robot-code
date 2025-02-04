@@ -15,15 +15,14 @@ public class VisionSubsystem extends SubsystemBase {
 	private LimelightIO io;
 	private LimelightConfiguration config;
 	private final LimelightInputsAutoLogged inputs = new LimelightInputsAutoLogged();
-	private Pose2d robotToApriltag = new Pose2d();
+	private Pose2d robotToField = new Pose2d();
 	private double mt2Timestamp = 0.0;
 	private boolean doRejectUpdate = false;
 
-	public void init() {
+	public void init(LimelightConfiguration config) {
 		config = new LimelightConfiguration();
 		io = new LimelightIO(config.Name);
-		LimelightHelpers.SetRobotOrientation(
-				config.Name, drive.getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+
 		//System.out.println("Initialized limelight with name, " + config.Name + "");
 	}
 
@@ -31,17 +30,20 @@ public class VisionSubsystem extends SubsystemBase {
 	public void periodic() {
 		io.updateInputs(inputs);
 		Logger.processInputs(config.Name, inputs);
-
+		LimelightHelpers.SetRobotOrientation(
+				config.Name, drive.getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
 		LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(config.Name);
+
 		if (Math.abs(imu.getAngularVelocity()) > 720) {
 			doRejectUpdate = true;
-		} else if (!hasTarget()) {
+		}
+		if (!hasTarget()) {
 			doRejectUpdate = true;
 		}
 		if (!doRejectUpdate) {
-			robotToApriltag = mt2.pose;
+			robotToField = mt2.pose;
 			mt2Timestamp = mt2.timestampSeconds;
-			drive.addLimelightMeasurement(robotToApriltag, mt2Timestamp);
+			drive.addLimelightMeasurement(robotToField, mt2Timestamp);
 			//System.out.println("Sent measurement");
 		}
 	}
@@ -59,6 +61,6 @@ public class VisionSubsystem extends SubsystemBase {
 	}
 
 	public Optional<Pose2d> getEstimatePose() {
-		return Optional.of(this.robotToApriltag);
+		return Optional.of(this.robotToField);
 	}
 }

@@ -9,8 +9,8 @@ import edu.wpi.first.math.util.Units;
 public final class Constants {
 
 	public static final class RobotConstants {
-		public static final double ROBOT_LENGTH = Units.inchesToMeters(29);
-		public static final double ROBOT_WIDTH = Units.inchesToMeters(29);
+		public static final double ROBOT_LENGTH = Units.inchesToMeters(28);
+		public static final double ROBOT_WIDTH = Units.inchesToMeters(27);
 
 		public static final double SWERVE_MAXSPEED = 4.42;
 		public static final double ANGULAR_MAX_SPEED = SWERVE_MAXSPEED / (Math.hypot(ROBOT_LENGTH, ROBOT_WIDTH) / 2);

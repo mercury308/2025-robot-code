@@ -47,8 +47,6 @@ public class PhotonVision {
 		}
 
 		april_cam1 = new PhotonCamera("Global_Shutter_Camera");
-		april_cam2 = new PhotonCamera("Global_Shutter_Camera (1)");
-		april_cam3 = new PhotonCamera("Global_Shutter_Camera (2)");
 
 		photonPoseEstimator1 =
 				new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam1);

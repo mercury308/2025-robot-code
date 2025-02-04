@@ -22,7 +22,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.RobotContainer.drive;
@@ -230,14 +229,6 @@ public class SwerveSubsystem extends SubsystemBase {
 		ChassisSpeeds velocity = drive.getVelocity();
 		double theta = drive.getPose().getRotation().getRadians();
 		return velocity.vxMetersPerSecond * Math.cos(theta) - velocity.vyMetersPerSecond * Math.sin(theta);
-	}
-
-	public SwerveDriveKinematics getKinematics() {
-		return this.kinematics;
-	}
-
-	public TrajectoryConfig getConfig() {
-		return new TrajectoryConfig(3.00, 3.00);
 	}
 
 	public Command followPath(String fileString) throws FileVersionException, IOException, ParseException {

@@ -1,21 +1,23 @@
 package frc.robot.commands.drive;
 
-import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.photon;
-import static frc.robot.util.Util.getAdjustedPose;
+import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.photon;
 import frc.robot.util.Util;
-import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
+import static frc.robot.util.Util.getAdjustedPose;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class AlignToReef extends Command {
 
 	// TODO: Adjust PID gains
-
+	
 	private PIDController xPID = new PIDController(1.25, 0, 0);
 	private PIDController yPID = new PIDController(1.25, 0, 0);
 	private PIDController wPID = new PIDController(1.5, 0., 0.4);
