@@ -18,11 +18,11 @@ import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.util.LocalADStarAK;
 
-
 public class RobotContainer {
 	public static SwerveSubsystem drive = new SwerveSubsystem();
 	public static IMU imu = new IMU();
-	//public static PhotonVision photon = new PhotonVision();
+	// public static PhotonVision photon = new PhotonVision();
+	public static LimelightConfiguration config = new LimelightConfiguration();
 	public static VisionSubsystem limelight1 = new VisionSubsystem();
 
 	public static CommandJoystick left_js = new CommandJoystick(4);
@@ -30,8 +30,6 @@ public class RobotContainer {
 	public static CommandJoystick ds = new CommandJoystick(2);
 
 	public static LoggedDashboardChooser<Command> autoChooser;
-
-	public static LimelightConfiguration config = new LimelightConfiguration();
 
 	public RobotContainer() {}
 

@@ -1,15 +1,14 @@
 package frc.robot.subsystems.vision;
 
-import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
-import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.imu;
 import frc.robot.constants.LimelightConfiguration;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
 	private LimelightIO io;
@@ -23,7 +22,7 @@ public class VisionSubsystem extends SubsystemBase {
 		config = new LimelightConfiguration();
 		io = new LimelightIO(config.Name);
 
-		//System.out.println("Initialized limelight with name, " + config.Name + "");
+		// System.out.println("Initialized limelight with name, " + config.Name + "");
 	}
 
 	@Override
@@ -44,7 +43,7 @@ public class VisionSubsystem extends SubsystemBase {
 			robotToField = mt2.pose;
 			mt2Timestamp = mt2.timestampSeconds;
 			drive.addLimelightMeasurement(robotToField, mt2Timestamp);
-			//System.out.println("Sent measurement");
+			// System.out.println("Sent measurement");
 		}
 	}
 
@@ -64,8 +63,7 @@ public class VisionSubsystem extends SubsystemBase {
 		return Optional.of(this.robotToField);
 	}
 
-	public int getTargetID(){
+	public int getTargetID() {
 		return inputs.iD;
 	}
-
 }

@@ -1,23 +1,22 @@
 package frc.robot.commands.drive;
 
-import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.RobotContainer.drive;
 import static frc.robot.util.Util.convertAngle;
 import static frc.robot.util.Util.getAdjustedPose;
 import static frc.robot.util.Util.getAprilTagPose;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
+
 @SuppressWarnings("FieldMayBeFinal")
 public class AlignToReef extends Command {
 
 	// TODO: Adjust PID gains
-	
+
 	private PIDController xPID = new PIDController(1.25, 0, 0);
 	private PIDController yPID = new PIDController(1.25, 0, 0);
 	private PIDController wPID = new PIDController(1.5, 0., 0.4);
@@ -90,9 +89,8 @@ public class AlignToReef extends Command {
 		double dX = Math.abs(current_pose.getX() - adj_pose.getX());
 		double dY = Math.abs(current_pose.getY() - adj_pose.getY()); // Translational difference
 
-		double angle_offset =
-				Math.abs(convertAngle(current_pose.getRotation().getRadians())
-						- convertAngle(adj_pose.getRotation().getRadians())); // Angular difference
+		double angle_offset = Math.abs(convertAngle(current_pose.getRotation().getRadians())
+				- convertAngle(adj_pose.getRotation().getRadians())); // Angular difference
 
 		if (dX < 0.04 && dY < 0.04 && angle_offset <= (4 * Math.PI) / 360) {
 			System.out.println("Aligned");

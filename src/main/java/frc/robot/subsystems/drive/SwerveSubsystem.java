@@ -105,7 +105,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		return kinematics.toChassisSpeeds(pos);
 	}
 
-	public ChassisSpeeds desired_speeds = new ChassisSpeeds();
+	public ChassisSpeeds desired_speeds = new ChassisSpeeds();	
 
 	/**
 	 * Drives the swerve subsystem at the specified speed.
@@ -185,13 +185,13 @@ public class SwerveSubsystem extends SubsystemBase {
 		for (SwerveModule module : modules) module.periodic();
 		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
-		//est_pos = photon.getEstimatedGlobalPose();
+		// est_pos = photon.getEstimatedGlobalPose();
 
-		//if (est_pos.isPresent()) {
+		// if (est_pos.isPresent()) {
 		//	EstimatedRobotPose new_pose = est_pos.get();
 		//	Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
 		//	pose_est.addVisionMeasurement(new_pose.estimatedPose.toPose2d(), new_pose.timestampSeconds);
-		//}
+		// }
 
 		updateLogging();
 	}
@@ -234,10 +234,8 @@ public class SwerveSubsystem extends SubsystemBase {
 		PathPlannerPath path = PathPlannerPath.fromPathFile(fileString);
 		return AutoBuilder.followPath(path);
 	}
-	// TODO: Compensate for latency 
+	// TODO: Compensate for latency
 	public void addLimelightMeasurement(Pose2d est, double timeStamp) {
 		pose_est.addVisionMeasurement(est, timeStamp);
 	}
-
-
 }
