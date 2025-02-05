@@ -5,7 +5,10 @@ import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.signum;
 import static java.lang.Math.sin;
+import java.util.Optional;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -102,6 +105,13 @@ public class Util {
 		} else {
 			return angle - (2 * Math.PI);
 		}
+	}
+	
+	static AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+	
+		
+	public static Optional<Pose2d> getAprilTagPose(int id) {
+		return Optional.of(fieldLayout.getTagPose(id).get().toPose2d());
 	}
 
 	public static Pose2d getAdjustedPose(Pose2d target) {

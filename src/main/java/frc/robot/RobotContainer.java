@@ -15,7 +15,6 @@ import frc.robot.commands.drive.AlignToReef;
 import frc.robot.commands.drive.DefaultDrive;
 import frc.robot.constants.LimelightConfiguration;
 import frc.robot.subsystems.drive.SwerveSubsystem;
-import frc.robot.subsystems.vision.PhotonVision;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.util.LocalADStarAK;
 
@@ -23,7 +22,7 @@ import frc.robot.util.LocalADStarAK;
 public class RobotContainer {
 	public static SwerveSubsystem drive = new SwerveSubsystem();
 	public static IMU imu = new IMU();
-	public static PhotonVision photon = new PhotonVision();
+	//public static PhotonVision photon = new PhotonVision();
 	public static VisionSubsystem limelight1 = new VisionSubsystem();
 
 	public static CommandJoystick left_js = new CommandJoystick(4);

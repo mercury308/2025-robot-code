@@ -39,13 +39,6 @@ public class PhotonVision {
 	//	private Pose2d camRobot = new Pose2d(Units.inchesToMeters(0), Units.inchesToMeters(11), new Rotation2d());
 
 	public PhotonVision() {
-		try {
-			fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-		} catch (UncheckedIOException e) {
-			System.out.println("Couldn't Find April Tag Layout File");
-			e.printStackTrace();
-		}
-
 		april_cam1 = new PhotonCamera("Global_Shutter_Camera");
 
 		photonPoseEstimator1 =
@@ -78,20 +71,5 @@ public class PhotonVision {
 	 */
 	public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
 		return getEstimate(april_cam1, photonPoseEstimator1);
-	}
-	// Returns the pose of an AprilTag relative to CAMERA
-	public Optional<Pose2d> getAprilTagPose(int id) {
-		// if (april_cam1 == null) return Optional.empty();
-		// if (!april_cam1.isConnected()) return Optional.empty();
-		// // if (april_cam.getLatestResult().getTargets().size() < 2) return Optional.empty();
-
-		// PhotonTrackedTarget target = april_cam1.getLatestResult().getBestTarget();
-		// if (target == null) {
-		// 	// System.out.println("NO TARGETS IN SIGHT");
-		// 	return Optional.empty();
-		// }
-
-		// return Optional.of(fieldLayout.getTagPose(target.getFiducialId()).get().toPose2d());
-		return Optional.of(fieldLayout.getTagPose(id).get().toPose2d());
 	}
 }

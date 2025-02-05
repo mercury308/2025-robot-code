@@ -9,9 +9,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.photon;
-import frc.robot.util.Util;
+import static frc.robot.util.Util.convertAngle;
 import static frc.robot.util.Util.getAdjustedPose;
+import static frc.robot.util.Util.getAprilTagPose;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class AlignToReef extends Command {
@@ -38,7 +38,7 @@ public class AlignToReef extends Command {
 	public void initialize() {
 		// target_pose = photon.getAprilTagPose();
 		// target_pose = photon.getAprilTagPose(20);
-		target_pose = photon.getAprilTagPose(target_id);
+		target_pose = getAprilTagPose(target_id);
 		if (target_pose.isEmpty()
 				&& stored_pose
 						.isEmpty()) { // For reliability, if not receiving new pose from PhotonVision, use previously
@@ -91,8 +91,8 @@ public class AlignToReef extends Command {
 		double dY = Math.abs(current_pose.getY() - adj_pose.getY()); // Translational difference
 
 		double angle_offset =
-				Math.abs(Util.convertAngle(current_pose.getRotation().getRadians())
-						- Util.convertAngle(adj_pose.getRotation().getRadians())); // Angular difference
+				Math.abs(convertAngle(current_pose.getRotation().getRadians())
+						- convertAngle(adj_pose.getRotation().getRadians())); // Angular difference
 
 		if (dX < 0.04 && dY < 0.04 && angle_offset <= (4 * Math.PI) / 360) {
 			System.out.println("Aligned");

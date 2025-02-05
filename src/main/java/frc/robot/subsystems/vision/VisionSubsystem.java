@@ -63,4 +63,9 @@ public class VisionSubsystem extends SubsystemBase {
 	public Optional<Pose2d> getEstimatePose() {
 		return Optional.of(this.robotToField);
 	}
+
+	public int getTargetID(){
+		return inputs.iD;
+	}
+
 }

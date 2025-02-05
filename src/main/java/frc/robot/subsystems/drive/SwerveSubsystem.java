@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.RobotContainer.drive;
 import static frc.robot.RobotContainer.imu;
-import static frc.robot.RobotContainer.photon;
 import static frc.robot.constants.Constants.PATH_FOLLOWER_CONFIG;
 import static frc.robot.constants.Constants.ROBOT_CONFIG;
 import static frc.robot.constants.Constants.RobotConstants.ROBOT_LENGTH;
@@ -37,10 +36,10 @@ import frc.robot.util.Util;
 
 public class SwerveSubsystem extends SubsystemBase {
 	public SwerveModule[] modules = new SwerveModule[] {
-		new SwerveModule(new ModuleIOSparkMax(SwerveModuleConfiguration.NW), "NW"),
-		new SwerveModule(new ModuleIOSparkMax(SwerveModuleConfiguration.NE), "NE"),
-		new SwerveModule(new ModuleIOSparkMax(SwerveModuleConfiguration.SW), "SW"),
-		new SwerveModule(new ModuleIOSparkMax(SwerveModuleConfiguration.SE), "SE"),
+		new SwerveModule(new ModuleIOTalonFX(SwerveModuleConfiguration.NW), "NW"),
+		new SwerveModule(new ModuleIOTalonFX(SwerveModuleConfiguration.NE), "NE"),
+		new SwerveModule(new ModuleIOTalonFX(SwerveModuleConfiguration.SW), "SW"),
+		new SwerveModule(new ModuleIOTalonFX(SwerveModuleConfiguration.SE), "SE"),
 	};
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
 			new Translation2d(ROBOT_LENGTH / 2, ROBOT_WIDTH / 2),
@@ -186,13 +185,13 @@ public class SwerveSubsystem extends SubsystemBase {
 		for (SwerveModule module : modules) module.periodic();
 		pose_est.update(new Rotation2d(imu.yaw()), getPositions());
 
-		est_pos = photon.getEstimatedGlobalPose();
+		//est_pos = photon.getEstimatedGlobalPose();
 
-		if (est_pos.isPresent()) {
-			EstimatedRobotPose new_pose = est_pos.get();
-			Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
-			pose_est.addVisionMeasurement(new_pose.estimatedPose.toPose2d(), new_pose.timestampSeconds);
-		}
+		//if (est_pos.isPresent()) {
+		//	EstimatedRobotPose new_pose = est_pos.get();
+		//	Logger.recordOutput("PhotonPose", new_pose.estimatedPose.toPose2d());
+		//	pose_est.addVisionMeasurement(new_pose.estimatedPose.toPose2d(), new_pose.timestampSeconds);
+		//}
 
 		updateLogging();
 	}
@@ -237,7 +236,6 @@ public class SwerveSubsystem extends SubsystemBase {
 	}
 	// TODO: Compensate for latency 
 	public void addLimelightMeasurement(Pose2d est, double timeStamp) {
-		Pose2d previousPose = pose_buffer.getSample(timeStamp).get();
 		pose_est.addVisionMeasurement(est, timeStamp);
 	}
 
