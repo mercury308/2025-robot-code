@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 public class LimelightConfiguration {
 
-	public String Name = "limelight";
+	public String Name = "limelight1";
 	public double LimelightMountingRollRadians = 0;
 	public double LimelightMountingYawRadians = 0;
 	public double LimelightMountingPitchRadians = 0;

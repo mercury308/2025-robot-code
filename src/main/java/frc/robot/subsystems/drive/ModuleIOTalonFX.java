@@ -1,17 +1,10 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.constants.Constants.MODULE_DRIVE_KF;
-import static frc.robot.constants.Constants.MODULE_DRIVE_KP;
-import static frc.robot.constants.Constants.RobotConstants.L3_DRIVE_RATIO;
-import static frc.robot.constants.Constants.RobotConstants.L3_TURN_RATIO;
-
 import static java.lang.Math.PI;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -19,6 +12,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import static frc.robot.constants.Constants.MODULE_DRIVE_KF;
+import static frc.robot.constants.Constants.MODULE_DRIVE_KP;
+import static frc.robot.constants.Constants.RobotConstants.L3_DRIVE_RATIO;
+import static frc.robot.constants.Constants.RobotConstants.L3_TURN_RATIO;
 import frc.robot.constants.SwerveModuleConfiguration;
 
 /**
@@ -37,7 +34,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 	private final TalonFXConfigurator driveConfigurator;
 	private final TalonFXConfigurator turnConfigurator;
 
-	private final CANCoder turnAbsoluteEncoder;
+	private final CANcoder turnAbsoluteEncoder;
 
 	private final boolean isTurnMotorInverted = true;
 	private final Rotation2d absoluteEncoderOffset;
@@ -49,7 +46,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 		driveConfigurator = driveTalonFX.getConfigurator();
 		turnConfigurator = turnTalonFX.getConfigurator();
 
-		turnAbsoluteEncoder = new CANCoder(config.ENCODER);
+		turnAbsoluteEncoder = new CANcoder(config.ENCODER);
 		absoluteEncoderOffset = config.offset; // MUST BE CALIBRATED
 
 		driveConfigurator.apply(new TalonFXConfiguration());
@@ -88,7 +85,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 		inputs.driveCurrentAmps = new double[] {driveTalonFX.getStatorCurrent().getValueAsDouble()};
 
 		inputs.turnAbsolutePosition = new Rotation2d(
-						Units.rotationsToRadians(turnAbsoluteEncoder.getAbsolutePosition()))
+						Units.rotationsToRadians(turnAbsoluteEncoder.getAbsolutePosition().getValueAsDouble()))
 				.minus(absoluteEncoderOffset);
 		inputs.turnAbsolutePositionRad = inputs.turnAbsolutePosition.getRadians();
 		inputs.turnPosition = Rotation2d.fromRotations(turnTalonFX.getPosition().getValueAsDouble() / TURN_GEAR_RATIO);

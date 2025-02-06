@@ -1,14 +1,15 @@
 package frc.robot.subsystems.vision;
 
-import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.imu;
+import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
 import frc.robot.constants.LimelightConfiguration;
-import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
 	private LimelightIO io;
@@ -18,8 +19,8 @@ public class VisionSubsystem extends SubsystemBase {
 	private double mt2Timestamp = 0.0;
 	private boolean doRejectUpdate = false;
 
-	public void init(LimelightConfiguration config) {
-		config = new LimelightConfiguration();
+	public void init(LimelightConfiguration _config) {
+		config = _config;
 		io = new LimelightIO(config.Name);
 
 		// System.out.println("Initialized limelight with name, " + config.Name + "");
