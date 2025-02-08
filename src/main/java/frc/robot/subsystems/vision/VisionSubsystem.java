@@ -44,7 +44,7 @@ public class VisionSubsystem extends SubsystemBase {
 			robotToField = mt2.pose;
 			mt2Timestamp = mt2.timestampSeconds;
 			drive.addLimelightMeasurement(robotToField, mt2Timestamp);
-			// System.out.println("Sent measurement");
+			System.out.println("Sent measurement");
 		}
 	}
 

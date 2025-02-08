@@ -23,6 +23,7 @@ public class RobotContainer {
 	public static IMU imu = new IMU();
 	// public static PhotonVision photon = new PhotonVision();
 	public static LimelightConfiguration config = new LimelightConfiguration();
+	public static LimelightConfiguration config2 = new LimelightConfiguration();
 	public static VisionSubsystem limelight1 = new VisionSubsystem();
 
 	public static CommandJoystick left_js = new CommandJoystick(4);
@@ -36,6 +37,7 @@ public class RobotContainer {
 	public static void initSubsystems() {
 
 		config = config.setName("limelight");
+		config2 = config.setName("limelight2");
 		imu.zeroYaw();
 
 		drive.setDefaultCommand(new DefaultDrive(() -> left_js.getY(), () -> left_js.getX(), () -> -right_js.getX()));

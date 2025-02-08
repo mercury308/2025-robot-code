@@ -1,20 +1,16 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.constants.Constants.*;
-import static frc.robot.constants.Constants.RobotConstants.*;
-
-import static java.lang.Math.*;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
+import static java.lang.Math.PI;
 
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
-import frc.robot.Robot;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import static frc.robot.constants.Constants.MODULE_TURN_KP;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_WHEEL_RAD;
 
 /**
  * Represents a swerve module on a robot's drive system.
@@ -103,10 +99,8 @@ public class SwerveModule {
 	public void periodic() {
 		double target_vel = Math.abs(Math.cos((getDirection() - target_state.angle.getRadians())))
 				* target_state.speedMetersPerSecond;
-
 		io.setTurnVoltage(pidTurn.calculate(getDirection(), target_state.angle.getRadians()));
 		Logger.recordOutput(name+"__ERROR", MathUtil.angleModulus(getDirection()-target_state.angle.getRadians()));
-		//io.setTurnVoltage(pidTurn.calculate(getDirection(), Timer.getFPGATimestamp()));
 		io.setDriveVelocity(target_vel);
 
 		io.logTargetState(inputs, target_state, target_vel);
