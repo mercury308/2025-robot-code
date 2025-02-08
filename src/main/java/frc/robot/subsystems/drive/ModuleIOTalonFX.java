@@ -16,6 +16,7 @@ import static frc.robot.constants.Constants.MODULE_DRIVE_KF;
 import static frc.robot.constants.Constants.MODULE_DRIVE_KP;
 import static frc.robot.constants.Constants.RobotConstants.L3_DRIVE_RATIO;
 import static frc.robot.constants.Constants.RobotConstants.L3_TURN_RATIO;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_WHEEL_RAD;
 import frc.robot.constants.SwerveModuleConfiguration;
 
 /**
@@ -61,15 +62,19 @@ public class ModuleIOTalonFX implements ModuleIO {
 
 		driveConfig.Slot0.kP = MODULE_DRIVE_KP;
 		driveConfig.Slot0.kD = MODULE_DRIVE_KF; // Drive FeedForwards
-        driveConfig.CurrentLimits.withSupplyCurrentLimit(30);
+		driveConfig.Slot0.kV = 
+			(Units.rotationsPerMinuteToRadiansPerSecond(1) / DRIVE_GEAR_RATIO * SWERVE_WHEEL_RAD);
+		driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;	
+       		driveConfig.CurrentLimits.withSupplyCurrentLimit(30);
 		driveConfigurator.apply(driveConfig);
 
 		turnConfig.Slot0.kP = MODULE_DRIVE_KP;
 		turnConfig.Slot0.kD = MODULE_DRIVE_KF; // Turn FeedForwards
-        turnConfig.MotorOutput.Inverted = 
-            isTurnMotorInverted ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-        turnConfig.CurrentLimits.withStatorCurrentLimit(20);
+        	turnConfig.MotorOutput.Inverted = 
+           	 isTurnMotorInverted ? InvertedValue.Clockwise_Positive
+            	: InvertedValue.CounterClockwise_Positive;
+		turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;	
+        	turnConfig.CurrentLimits.withStatorCurrentLimit(20);
 		turnConfigurator.apply(turnConfig);
 
 		driveTalonFX.setNeutralMode(NeutralModeValue.Brake);
@@ -99,7 +104,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
 	@Override
 	public void setDriveVoltage(double volts) {
-		driveTalonFX.setVoltage(volts / 12.0);
+		driveTalonFX.setVoltage(volts);
 	}
 
 	@Override
@@ -109,7 +114,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
 	@Override
 	public void setTurnVoltage(double volts) {
-		turnTalonFX.setVoltage(volts / 12.0);
+		turnTalonFX.setVoltage(volts);
 	}
 
 	@Override

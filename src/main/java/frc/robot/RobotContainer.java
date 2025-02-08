@@ -36,6 +36,7 @@ public class RobotContainer {
 	public static void initSubsystems() {
 
 		config = config.setName("limelight");
+		imu.zeroYaw();
 
 		drive.setDefaultCommand(new DefaultDrive(() -> left_js.getY(), () -> left_js.getX(), () -> -right_js.getX()));
 		drive.init(new Pose2d());

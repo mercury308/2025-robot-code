@@ -1,7 +1,5 @@
 package frc.robot.constants;
 
-import static java.lang.Math.*;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
@@ -9,10 +7,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
  * Includes motor ports, encoder ports, and offset angles.
  */
 public enum SwerveModuleConfiguration {
-	NW(18, 9, 10, PI),
-	NE(17, 7, 8, PI),
-	SW(15, 11, 12, PI),
-	SE(16, 5, 6, PI);
+	NW(18, 9, 10, 0),
+	NE(17, 7, 8, 0),
+	SW(15, 11, 12, 0),
+	SE(16, 5, 6, 0);
 	public int ENCODER, TURN_MOTOR, DRIVE_MOTOR;
 	public Rotation2d offset;
 
