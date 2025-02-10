@@ -1,20 +1,14 @@
 package frc.robot.util;
 
-import static frc.robot.constants.Constants.RobotConstants.ANGULAR_MAX_SPEED;
-import static frc.robot.constants.Constants.RobotConstants.ANGULAR_SPEED_MULT;
-import static frc.robot.constants.Constants.RobotConstants.ROBOT_WIDTH;
-import static frc.robot.constants.Constants.RobotConstants.SPEED_MULT;
-import static frc.robot.constants.Constants.RobotConstants.SWERVE_MAXSPEED;
-import static frc.robot.constants.Constants.RobotConstants.TURBO_ANGULAR_SPEED_MULT;
-import static frc.robot.constants.Constants.RobotConstants.TURBO_SPEED_MULT;
 import static java.lang.Math.abs;
 import static java.lang.Math.cos;
 import static java.lang.Math.exp;
 import static java.lang.Math.signum;
 import static java.lang.Math.sin;
+import java.util.Optional;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
+import  edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,12 +18,20 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import java.util.Optional;
+import edu.wpi.first.wpilibj.Timer;
+import static frc.robot.RobotContainer.robot;
+import static frc.robot.constants.Constants.RobotConstants.ANGULAR_MAX_SPEED;
+import static frc.robot.constants.Constants.RobotConstants.ANGULAR_SPEED_MULT;
+import static frc.robot.constants.Constants.RobotConstants.ROBOT_WIDTH;
+import static frc.robot.constants.Constants.RobotConstants.SPEED_MULT;
+import static frc.robot.constants.Constants.RobotConstants.SWERVE_MAXSPEED;
+import static frc.robot.constants.Constants.RobotConstants.TURBO_ANGULAR_SPEED_MULT;
+import static frc.robot.constants.Constants.RobotConstants.TURBO_SPEED_MULT;
 
 public class Util {
 	// tuned value for sigmoid, higher values make the curve steeper, this is what thomas likes. Use desmos to preview
 	// curves
-	private static double a = 2;
+	private static double a = 1;
 
 	/**
 	 * Applies a sensitivity curve to a given input value.
@@ -75,6 +77,7 @@ public class Util {
 	 * @return The ChassisSpeeds object representing the speeds of the robot chassis.
 	 */
 	public static ChassisSpeeds joystickToSpeeds(double vx, double vy, double w, boolean turbo, Rotation2d rot) {
+		double time = Timer.getFPGATimestamp();
 		double mag = Math.hypot(vx, vy);
 		double mag_curved = MathUtil.clamp(Util.sensCurve(mag, 0.15) * 1.5, -1, 1);
 
@@ -83,11 +86,14 @@ public class Util {
 
 		double speed_mult = turbo ? TURBO_SPEED_MULT : SPEED_MULT;
 		double angular_mult = turbo ? TURBO_ANGULAR_SPEED_MULT : ANGULAR_SPEED_MULT;
-		return ChassisSpeeds.fromFieldRelativeSpeeds(
+		if (robot.isEnabled()) System.out.println("SUSVE6: " + (Timer.getFPGATimestamp() - time));
+		ChassisSpeeds ret = ChassisSpeeds.fromFieldRelativeSpeeds(
 				cos(theta) * mag_curved * SWERVE_MAXSPEED * speed_mult * sign,
 				sin(theta) * mag_curved * SWERVE_MAXSPEED * speed_mult * sign,
 				MathUtil.applyDeadband(w, 0.1) * ANGULAR_MAX_SPEED * angular_mult,
 				rot);
+		if (robot.isEnabled()) System.out.println("SUSVE6: " + (Timer.getFPGATimestamp() - time));
+		return ret;
 	}
 
 	/**

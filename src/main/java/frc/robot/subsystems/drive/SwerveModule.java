@@ -52,6 +52,7 @@ public class SwerveModule {
 	 * @param state the desired state of the SwerveModule
 	 */
 	public void setState(SwerveModuleState state) {
+		//System.out.println("Setting states ");
 		state.optimize(new Rotation2d(getDirection()));
 		target_state = state;
 	}
@@ -99,8 +100,10 @@ public class SwerveModule {
 	public void periodic() {
 		double target_vel = Math.abs(Math.cos((getDirection() - target_state.angle.getRadians())))
 				* target_state.speedMetersPerSecond;
+
+		Logger.recordOutput(name + "__ERROR", MathUtil.angleModulus(getDirection() - target_state.angle.getRadians()));
+
 		io.setTurnVoltage(pidTurn.calculate(getDirection(), target_state.angle.getRadians()));
-		Logger.recordOutput(name+"__ERROR", MathUtil.angleModulus(getDirection()-target_state.angle.getRadians()));
 		io.setDriveVelocity(target_vel);
 
 		io.logTargetState(inputs, target_state, target_vel);

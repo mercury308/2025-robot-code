@@ -1,12 +1,7 @@
 package frc.robot;
 
-import java.util.Set;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
@@ -17,8 +12,11 @@ import frc.robot.constants.LimelightConfiguration;
 import frc.robot.subsystems.drive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.util.LocalADStarAK;
+import java.util.Set;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
+	public static Robot robot;
 	public static SwerveSubsystem drive = new SwerveSubsystem();
 	public static IMU imu = new IMU();
 	// public static PhotonVision photon = new PhotonVision();
@@ -31,8 +29,6 @@ public class RobotContainer {
 	public static CommandJoystick ds = new CommandJoystick(2);
 
 	public static LoggedDashboardChooser<Command> autoChooser;
-
-	public RobotContainer() {}
 
 	public static void initSubsystems() {
 
@@ -59,7 +55,7 @@ public class RobotContainer {
 		right_js.button(4).onTrue(new DeferredCommand(() -> autoChooser.get(), Set.of(drive)));
 	}
 
-	public Command getAutonomousCommand() {
+	public static Command getAutonomousCommand() {
 		return autoChooser.get();
 	}
 }

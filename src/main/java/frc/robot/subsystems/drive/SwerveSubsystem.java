@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.RobotContainer.drive;
@@ -105,7 +106,7 @@ public class SwerveSubsystem extends SubsystemBase {
 		return kinematics.toChassisSpeeds(pos);
 	}
 
-	public ChassisSpeeds desired_speeds = new ChassisSpeeds();	
+	public ChassisSpeeds desired_speeds = new ChassisSpeeds();
 
 	/**
 	 * Drives the swerve subsystem at the specified speed.
@@ -113,6 +114,7 @@ public class SwerveSubsystem extends SubsystemBase {
 	 * @param speed the desired speed of the swerve subsystem
 	 */
 	public void drive(ChassisSpeeds speed) {
+		System.out.println("Driving " + Timer.getFPGATimestamp());
 		speed = ChassisSpeeds.discretize(speed, 0.02);
 		desired_speeds = speed;
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(speed);

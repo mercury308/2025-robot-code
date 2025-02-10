@@ -3,7 +3,6 @@ package frc.robot.constants;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -15,7 +14,7 @@ public final class Constants {
 		public static final double SWERVE_MAXSPEED = 4.42;
 		public static final double ANGULAR_MAX_SPEED = SWERVE_MAXSPEED / (Math.hypot(ROBOT_LENGTH, ROBOT_WIDTH) / 2);
 
-		public static final double SPEED_MULT = 0.25;
+		public static final double SPEED_MULT = 0.5;
 		public static final double TURBO_SPEED_MULT = 1;
 
 		public static final double ANGULAR_SPEED_MULT = 0.75;

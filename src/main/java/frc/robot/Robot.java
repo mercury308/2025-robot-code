@@ -4,27 +4,27 @@
 
 package frc.robot;
 
-import static frc.robot.RobotContainer.drive;
-import static frc.robot.RobotContainer.imu;
-import static frc.robot.RobotContainer.initSubsystems;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import static frc.robot.RobotContainer.drive;
+import static frc.robot.RobotContainer.imu;
+import static frc.robot.RobotContainer.initSubsystems;
+import frc.robot.util.Util;
+
 public class Robot extends LoggedRobot {
 	private Command m_autonomousCommand;
 
-	private RobotContainer m_robotContainer;
-
 	@Override
 	public void robotInit() {
+		Util.getAprilTagPose(1); // Dont ask lmao
 		initSubsystems();
-		m_robotContainer = new RobotContainer();
+		RobotContainer.robot = this;
 		Logger.recordMetadata("ProjectName", "Robot2025");
 		if (isReal()) {
 			// Logger.addDataReceiver(new WPILOGWriter("/D/logs"));
@@ -54,7 +54,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void autonomousInit() {
 		drive.zero();
-		m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+		m_autonomousCommand = RobotContainer.getAutonomousCommand();
 
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.schedule();
